@@ -7,14 +7,15 @@ import Newsletter from "../../components/Newsletter.astro";
 import TableOfContents from "../../components/TableOfContents.astro";
 import { getCollection } from "astro:content";
 
-// On-demand: resolve the post by slug at request time (server output).
-const { slug } = Astro.params;
-const post = (await getCollection("blog", ({ data }) => !data.draft)).find(
-  (p) => p.slug === slug
-);
-if (!post) {
-  return Astro.redirect("/blog", 302);
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
 }
+
+const { post } = Astro.props;
 const { Content } = await post.render();
 
 const allPosts = (await getCollection("blog", ({ data }) => !data.draft))

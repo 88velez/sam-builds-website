@@ -3,12 +3,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import CTABanner from "../../components/CTABanner.astro";
 import { getCollection } from "astro:content";
 
-// On-demand: resolve the service by slug at request time (server output).
-const { slug } = Astro.params;
-const service = (await getCollection("services")).find((s) => s.slug === slug);
-if (!service) {
-  return Astro.redirect("/services", 302);
+export async function getStaticPaths() {
+  const services = await getCollection("services");
+  return services.map((service) => ({
+    params: { slug: service.slug },
+    props: { service },
+  }));
 }
+
+const { service } = Astro.props;
 const { Content } = await service.render();
 ---
 
