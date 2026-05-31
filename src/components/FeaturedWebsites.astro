@@ -1,0 +1,291 @@
+---
+interface FeaturedSite {
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+  alt: string;
+  category?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  subheading?: string;
+  sites: FeaturedSite[];
+  columns?: 2 | 3;
+}
+
+const { eyebrow, heading, subheading, sites, columns = 3 } = Astro.props;
+const categories = [...new Set(sites.filter((s) => s.category).map((s) => s.category!))];
+---
+
+<section class="section featured-websites">
+  <div class="container">
+    {(eyebrow || heading || subheading) && (
+      <header class="section-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        {heading && <h2>{heading}</h2>}
+        {subheading && <p class="subheading">{subheading}</p>}
+      </header>
+    )}
+
+    {categories.length > 0 && (
+      <div class="filter-tabs" role="tablist" aria-label="Filter by category">
+        <button class="tab active" data-filter="all" role="tab" aria-selected="true">All</button>
+        {categories.map((cat) => (
+          <button class="tab" data-filter={cat} role="tab" aria-selected="false">{cat}</button>
+        ))}
+      </div>
+    )}
+
+    <div class="sites-grid" data-columns={columns}>
+      {sites.map((site) => (
+        <article class="site-card" data-category={site.category || ""}>
+          <a
+            href={site.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="card-link"
+            aria-label={`Visit ${site.title} — opens in a new tab`}
+          >
+            <div class="card-preview">
+              <div class="browser-bar">
+                <span class="dot dot-red" aria-hidden="true"></span>
+                <span class="dot dot-yellow" aria-hidden="true"></span>
+                <span class="dot dot-green" aria-hidden="true"></span>
+                <span class="browser-url">{site.url.replace(/^https?:\/\//, "")}</span>
+                <span class="ext-icon" aria-hidden="true">↗</span>
+              </div>
+              <div class="card-image-wrap">
+                <img src={site.image} alt={site.alt} loading="lazy" />
+                <div class="card-overlay" aria-hidden="true">
+                  <span class="visit-label">Visit Site <span class="arrow">↗</span></span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-meta">
+                {site.category && <span class="category-badge">{site.category}</span>}
+              </div>
+              <h3 class="card-title">{site.title}</h3>
+              <p class="card-desc">{site.description}</p>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+  .section-header .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  .section-header h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-4);
+  }
+  .subheading {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: var(--leading-normal);
+  }
+
+  /* Filter tabs */
+  .filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+  .tab {
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  .tab:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .tab.active {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--color-primary);
+  }
+
+  /* Grid */
+  .sites-grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .sites-grid[data-columns="2"] { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  .sites-grid[data-columns="3"] { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+  /* Card */
+  .site-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out);
+  }
+  .site-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-accent);
+  }
+  .site-card.hidden { display: none; }
+
+  .card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* Browser chrome */
+  .browser-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg-alt);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+  }
+  .dot-red    { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green  { background: #28c840; }
+  .browser-url {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ext-icon {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+    flex-shrink: 0;
+  }
+  .site-card:hover .ext-icon { opacity: 1; }
+
+  /* Preview image */
+  .card-image-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  .card-image-wrap img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+  .site-card:hover .card-image-wrap img { transform: scale(1.04); }
+
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+  .site-card:hover .card-overlay { opacity: 1; }
+  .visit-label {
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--text-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .visit-label .arrow {
+    font-size: var(--text-xl);
+  }
+
+  /* Card body */
+  .card-body {
+    padding: var(--space-4) var(--space-5);
+  }
+  .card-meta {
+    margin-bottom: var(--space-2);
+  }
+  .category-badge {
+    display: inline-block;
+    padding: 2px var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    color: var(--color-accent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+  .card-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+    line-height: var(--leading-snug);
+  }
+  .card-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+    margin: 0;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>(".tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll<HTMLButtonElement>(".tab").forEach((b) => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      const filter = btn.dataset.filter;
+      document.querySelectorAll<HTMLElement>(".site-card").forEach((card) => {
+        const match = filter === "all" || card.dataset.category === filter;
+        card.classList.toggle("hidden", !match);
+      });
+    });
+  });
+</script>

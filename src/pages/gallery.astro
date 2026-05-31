@@ -1,74 +1,74 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Gallery from "../components/Gallery.astro";
+import FeaturedWebsites from "../components/FeaturedWebsites.astro";
 
-const galleryItems = [
-  { 
-    src: "https://placehold.co/800x600/020617/00f2fe?text=Pocono+Timber+Builders", 
-    alt: "Custom contractor website for a luxury local cabin builder", 
-    title: "Pocono Timber Builders", 
-    description: "Sleek portfolio showcase and automated estimate generator for a custom cabin framer.", 
-    category: "Contractor" 
+// To swap in real screenshots: drop a PNG in /public/portfolio/ and update the image path below.
+const sites = [
+  {
+    title: "PA Pioneers",
+    description: "Bold, high-performance site built for a local Pennsylvania organization — fast load times, mobile-first layout, and clear calls-to-action.",
+    url: "https://pa-pioneers.vercel.app",
+    image: "https://placehold.co/800x500/020617/00f2fe?text=PA+Pioneers",
+    alt: "PA Pioneers website",
+    category: "Local Business",
   },
-  { 
-    src: "https://placehold.co/800x600/020617/8b5cf6?text=Stroudsburg+Steakhouse", 
-    alt: "Fine dining restaurant menu and reservations system", 
-    title: "Stroudsburg Steakhouse", 
-    description: "A fast, phone-optimized digital menu and table reservations system avoiding commission cuts.", 
-    category: "Restaurant" 
+  {
+    title: "Finch Hill Restaurant",
+    description: "Elegant restaurant site with a digital menu, atmosphere gallery, and reservation-ready contact flow optimized for mobile diners.",
+    url: "https://finch-hill-restaurant.vercel.app",
+    image: "https://placehold.co/800x500/020617/8b5cf6?text=Finch+Hill+Restaurant",
+    alt: "Finch Hill Restaurant website",
+    category: "Restaurant",
   },
-  { 
-    src: "https://placehold.co/800x600/020617/0ea5e9?text=Scranton+Auto+Care", 
-    alt: "Auto body and collision center service page", 
-    title: "Scranton Auto Care", 
-    description: "Click-to-call service booking, emergency towing locator, and local Google Reviews slider.", 
-    category: "Service" 
+  {
+    title: "Savvy Shoppers",
+    description: "Retail-focused storefront site with product highlights, promotional sections, and a streamlined path from browse to contact.",
+    url: "https://savvy-shoppers.vercel.app",
+    image: "https://placehold.co/800x500/020617/f59e0b?text=Savvy+Shoppers",
+    alt: "Savvy Shoppers website",
+    category: "Retail",
   },
-  { 
-    src: "https://placehold.co/800x600/020617/d946ef?text=Pocono+Rental+Co", 
-    alt: "Outdoor equipment rental booking portal", 
-    title: "Pocono Rental Co", 
-    description: "Full booking system with live inventory selection, digital waivers, and secure deposits.", 
-    category: "Retail" 
+  {
+    title: "Mike's Auto Detailing",
+    description: "Click-to-call booking, before/after gallery, and local SEO setup for a mobile auto detailing business serving the NEPA area.",
+    url: "https://mikes-auto-detailing-website.vercel.app",
+    image: "https://placehold.co/800x500/020617/ef4444?text=Mike's+Auto+Detailing",
+    alt: "Mike's Auto Detailing website",
+    category: "Auto",
   },
-  { 
-    src: "https://placehold.co/800x600/020617/10b981?text=Kent+Chiropractic", 
-    alt: "Chiropractor booking and booking system", 
-    title: "Kent Chiropractic", 
-    description: "Patient scheduling portal with intake downloadables and localized structural SEO mapping.", 
-    category: "Service" 
+  {
+    title: "Velez Property Solutions",
+    description: "Professional property services site with service breakdowns, a trust-building about section, and a lead-capture contact form.",
+    url: "https://vps-velez-property-solutions.vercel.app",
+    image: "https://placehold.co/800x500/020617/10b981?text=Velez+Property+Solutions",
+    alt: "Velez Property Solutions website",
+    category: "Real Estate",
   },
-  { 
-    src: "https://placehold.co/800x600/020617/00f2fe?text=Mountain+Peak+Cabinetry", 
-    alt: "Kitchen cabinet woodworker product portfolio", 
-    title: "Mountain Peak Cabinetry", 
-    description: "Rich filterable project galleries, wood type selection grids, and local lead-capture forms.", 
-    category: "Contractor" 
-  }
 ];
 ---
 
-<BaseLayout 
-  title="Our Portfolio" 
-  description="Explore modern, custom-coded web design mockups for NEPA contractors, restaurants, shops, and service providers."
+<BaseLayout
+  title="Featured Websites"
+  description="Live websites built by Sam Builds Websites for NEPA contractors, restaurants, shops, and service providers. See real results."
 >
   <div class="tech-grid">
     <section class="section page-header text-center">
       <div class="container-narrow">
-        <p class="eyebrow">Proven Digital Results</p>
-        <h1>Our Web Showcase</h1>
+        <p class="eyebrow">Real Builds. Real Results.</p>
+        <h1>Featured Websites</h1>
         <p class="lead">
-          We don't build generic templates. Here are high-performance local web design builds engineered 
-          specifically for speed, search relevance, and leads conversion.
+          Every site you see here is live, fast, and actively driving leads for a real local business.
+          Click any card to visit the site.
         </p>
       </div>
     </section>
   </div>
 
-  <Gallery
-    eyebrow="Craftsmanship"
-    heading="Selected Builds"
-    items={galleryItems}
+  <FeaturedWebsites
+    eyebrow="Client Work"
+    heading="Live Sites We've Built"
+    subheading="Custom-coded, mobile-first, and built to rank locally."
+    sites={sites}
     columns={3}
   />
 </BaseLayout>

@@ -92,7 +92,7 @@ export const nav = {
     { label: "About", href: "/about" },
     { label: "Services", href: "/services" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Gallery", href: "/gallery" },
+    { label: "Featured Websites", href: "/gallery" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
   ],
