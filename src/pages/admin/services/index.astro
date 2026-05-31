@@ -1,0 +1,130 @@
+---
+export const prerender = false;
+
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { listServices } from "../../../lib/content-manager";
+
+const services = await listServices();
+---
+
+<AdminLayout title="Services" activePage="services">
+  <div class="page-header">
+    <p class="page-count">{services.length} {services.length === 1 ? "service" : "services"}</p>
+    <a href="/admin/services/new" class="btn btn-primary">+ New Service</a>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" id="search-input" class="search-input" placeholder="Search by title…" />
+  </div>
+
+  {services.length === 0 ? (
+    <div class="empty-state">
+      <div class="empty-icon" aria-hidden="true">◆</div>
+      <p class="empty-title">No services yet</p>
+      <p class="empty-desc">Add your first service to get started.</p>
+      <a href="/admin/services/new" class="btn btn-primary">Add your first service</a>
+    </div>
+  ) : (
+    <div class="table-wrap">
+      <table class="data-table" id="services-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Featured</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {services.map((svc) => (
+            <tr class="svc-row" data-search={svc.title}>
+              <td class="cell-title">
+                <a href={`/admin/services/${svc.slug}`} class="svc-link">{svc.title}</a>
+              </td>
+              <td class="cell-muted">{svc.price || "—"}</td>
+              <td class="cell-muted">{svc.duration || "—"}</td>
+              <td>
+                {svc.featured ? (
+                  <span class="featured-badge">Featured</span>
+                ) : (
+                  <span class="cell-muted">—</span>
+                )}
+              </td>
+              <td>
+                <div class="action-btns">
+                  <a href={`/admin/services/${svc.slug}`} class="btn btn-sm btn-outline">Edit</a>
+                  <button class="btn btn-sm btn-outline btn-danger" data-slug={svc.slug} data-action="delete">Delete</button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</AdminLayout>
+
+<script>
+  // Search
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.toLowerCase();
+      document.querySelectorAll(".svc-row").forEach(row => {
+        row.style.display = (row.dataset.search || "").toLowerCase().includes(q) ? "" : "none";
+      });
+    });
+  }
+
+  // Delete
+  document.querySelectorAll("[data-action='delete']").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const slug = btn.dataset.slug;
+      if (!confirm(`Delete service "${slug}"? This cannot be undone.`)) return;
+
+      btn.disabled = true;
+      btn.textContent = "Deleting…";
+
+      try {
+        const res = await fetch("/api/admin/services", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "delete", slug }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert("Error: " + (data.error || "Delete failed"));
+        }
+      } catch {
+        alert("Network error.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Delete";
+      }
+    });
+  });
+</script>
+
+<style>
+  .svc-link {
+    color: var(--color-primary, #1a3a5c);
+    text-decoration: none;
+  }
+
+  .svc-link:hover { color: var(--color-accent, #d97706); }
+
+  .featured-badge {
+    display: inline-block;
+    padding: 0.1875rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background: rgba(217, 119, 6, 0.1);
+    color: var(--color-accent, #d97706);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+</style>

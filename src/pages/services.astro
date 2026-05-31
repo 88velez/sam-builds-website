@@ -1,0 +1,320 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FeatureGrid from "../components/FeatureGrid.astro";
+import CTABanner from "../components/CTABanner.astro";
+import { site } from "../data/site.config";
+
+const coreServices = [
+  {
+    title: "Custom Coded Design",
+    description: "No slow page builders, bloated WordPress themes, or cookie-cutter templates. We custom-code your site from scratch using high-performance modern tech (Astro, HTML5, CSS3, vanilla JS) so it loads instantly and represents your brand perfectly.",
+    icon: "🎨"
+  },
+  {
+    title: "Mobile-First Architecture",
+    description: "Nearly 3 in 4 local buyers will discover your business on a smartphone. Our layouts are engineered phone-first: heavy touch target sizing, responsive click-to-call links, immediate map navigation, and ultra-lightweight page weight.",
+    icon: "📱"
+  },
+  {
+    title: "Local Search Optimization",
+    description: "A website is useless if clients can't find it. We integrate LocalBusiness schema metadata, build structural speed scores that Google loves, audit keyword density, and configure your local Google Maps listing.",
+    icon: "🔍"
+  },
+  {
+    title: "Online Booking & Ordering",
+    description: "Turn visits into revenue. We integrate interactive booking calendars for clinics/salons, secure e-commerce carts for retailers, and instant contactless menu ordering systems for restaurants.",
+    icon: "🛒"
+  }
+];
+
+const industries = [
+  {
+    title: "Contractors & Trades",
+    features: ["High-speed estimate request forms", "Filterable project portfolio galleries", "Service-area landing pages", "Automated review showcases", "Tap-to-call quick buttons"],
+    description: "Perfect for landscapers, carpenters, plumbers, builders, and roofers. We show off your craftsmanship and make it effortless for NEPA homeowners to get a quote.",
+    icon: "🔨"
+  },
+  {
+    title: "Food & Restaurants",
+    features: ["Digital responsive menus (easy update)", "Direct online ordering integration", "Contactless reservations booking", "Social media feeds setup", "Gift card & catering pages"],
+    description: "Ideal for Poconos pizzerias, bistros, coffee shops, and local pubs. Keep your digital presence as fresh as your cuisine, avoiding steep delivery-app commission cuts.",
+    icon: "🍕"
+  },
+  {
+    title: "Service Businesses",
+    features: ["1-click online appointment scheduler", "Service tiers comparison tables", "Staff bios & testimonial highlights", "Google Maps and route guidance", "Interactive SMS text-back setups"],
+    description: "Sleek setups for salons, dental clinics, accountants, auto repairs, and consulting agencies. Fill your booking pipeline on autopilot.",
+    icon: "💼"
+  },
+  {
+    title: "Retail & E-commerce",
+    features: ["Clean product catalogs & categories", "Secure credit card checkout pipelines", "Local curbside pickup scheduling", "Auto inventory email warnings", "Discount code engines"],
+    description: "Breathe new life into your local boutique, farm stand, or specialty shop. Allow your community to browse and buy your goods 24/7.",
+    icon: "🛍️"
+  }
+];
+---
+
+<BaseLayout 
+  title="Services" 
+  description="Explore our high-performance web development services in Northeastern PA, customized for contractors, restaurants, shops, and service providers."
+>
+  <div class="tech-grid">
+    <section class="section page-header text-center">
+      <div class="container-narrow">
+        <p class="eyebrow">Services Built for Local Impact</p>
+        <h1>How We Help Your Business Grow</h1>
+        <p class="lead">
+          I build fast, beautiful websites engineered to accomplish one core goal: 
+          <strong>convert local traffic into paying customers.</strong>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Core Services Grid -->
+  <section class="section core-services">
+    <div class="container">
+      <div class="section-header text-center mb-12">
+        <h3>Our Core Offerings</h3>
+        <p class="section-desc max-w-60">High-speed execution combined with custom design direction and technical mastery.</p>
+      </div>
+      
+      <div class="core-grid">
+        {coreServices.map(service => (
+          <div class="glass-card service-card">
+            <div class="service-icon">{service.icon}</div>
+            <h4>{service.title}</h4>
+            <p>{service.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Two Ways to Pay Informational Banner -->
+  <section class="section section-alt payment-banner">
+    <div class="container">
+      <div class="payment-inner glass-card">
+        <div class="payment-text">
+          <h3>Two Simple Ways to Invest</h3>
+          <p>
+            Choose the model that aligns with your cash flow. We deliver the exact same top-tier speed and custom-coded layout under both approaches.
+          </p>
+          <div class="payment-options">
+            <div class="payment-opt">
+              <strong>Option A: Pay in Full</strong>
+              <span>50% deposit / 50% at launch. Complete outright ownership of the code. Add optional hosting/care plans.</span>
+            </div>
+            <div class="payment-opt">
+              <strong>Option B: Monthly Subscription</strong>
+              <span>Flat setup fee + affordable monthly rate. Bundles premium hosting, backup systems, security, and monthly edits.</span>
+            </div>
+          </div>
+        </div>
+        <div class="payment-action">
+          <a href="/pricing" class="btn btn-accent btn-lg">Compare Packages</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Industry Solutions Section -->
+  <section class="section industry-solutions">
+    <div class="container">
+      <div class="section-header text-center mb-16">
+        <p class="eyebrow">Tailored by Industry</p>
+        <h3>Custom Solutions Sized for Your Business</h3>
+        <p class="section-desc max-w-60">We focus on building critical, high-converting features unique to your business sector.</p>
+      </div>
+
+      <div class="industries-grid">
+        {industries.map(industry => (
+          <article class="glass-card industry-card">
+            <div class="industry-header">
+              <span class="industry-icon">{industry.icon}</span>
+              <h4>{industry.title}</h4>
+            </div>
+            <p class="industry-desc">{industry.description}</p>
+            <div class="industry-features-box">
+              <h5>Included Deliverables:</h5>
+              <ul class="industry-features">
+                {industry.features.map(feat => (
+                  <li>{feat}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTABanner heading="Let's build your free preview homepage" description="Within 48 hours, I will design a custom mockup of your homepage. Totally free, no payment details required." />
+</BaseLayout>
+
+<style>
+  .text-center { text-align: center; }
+  .mb-12 { margin-bottom: var(--space-12); }
+  .mb-16 { margin-bottom: var(--space-16); }
+  .max-w-60 { max-width: 60ch; }
+
+  .page-header {
+    padding-block: clamp(var(--space-12), 10vw, var(--space-20));
+  }
+  .page-header h1 {
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+  .lead {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+  }
+
+  /* Core Offerings Grid */
+  .core-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+  .service-card {
+    padding: var(--space-8);
+    background: rgba(15, 23, 42, 0.4);
+    height: 100%;
+  }
+  .service-icon {
+    font-size: var(--text-4xl);
+    margin-bottom: var(--space-4);
+  }
+  .service-card h4 {
+    font-size: var(--text-xl);
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+  }
+  .service-card p {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+  }
+
+  /* Payment Banner */
+  .payment-banner {
+    padding-block: var(--space-12);
+  }
+  .payment-inner {
+    padding: var(--space-10);
+    display: grid;
+    grid-template-columns: 2.2fr 1fr;
+    gap: var(--space-8);
+    align-items: center;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-color: rgba(0, 242, 254, 0.15);
+  }
+  .payment-text h3 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-2);
+  }
+  .payment-text p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+  }
+  .payment-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+  .payment-opt strong {
+    display: block;
+    color: var(--color-accent);
+    margin-bottom: var(--space-1);
+    font-size: var(--text-sm);
+  }
+  .payment-opt span {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+    display: block;
+  }
+  .payment-action {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .payment-action .btn {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 880px) {
+    .payment-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .payment-options {
+      grid-template-columns: 1fr;
+      text-align: left;
+    }
+    .payment-action {
+      justify-content: center;
+    }
+  }
+
+  /* Industry Grid */
+  .industries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-8);
+  }
+  .industry-card {
+    padding: var(--space-6);
+    background: rgba(15, 23, 42, 0.3);
+    display: flex;
+    flex-direction: column;
+  }
+  .industry-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .industry-icon {
+    font-size: var(--text-3xl);
+  }
+  .industry-card h4 {
+    font-size: var(--text-lg);
+    color: var(--color-text);
+  }
+  .industry-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+    margin-bottom: var(--space-6);
+    flex-grow: 1;
+  }
+  .industry-features-box h5 {
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-3);
+  }
+  .industry-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .industry-features li {
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .industry-features li::before {
+    content: "⚡";
+    color: var(--color-accent);
+    font-size: 10px;
+  }
+</style>

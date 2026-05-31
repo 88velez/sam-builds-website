@@ -1,0 +1,143 @@
+---
+interface Stat {
+  value: string;
+  label: string;
+  prefix?: string;
+  suffix?: string;
+  icon?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  stats: Stat[];
+  columns?: 2 | 3 | 4;
+  animated?: boolean;  // count-up animation
+}
+
+const { eyebrow, heading, stats, columns = 4, animated = true } = Astro.props;
+---
+
+<section class="section stats-section">
+  <div class="container">
+    {(eyebrow || heading) && (
+      <header class="section-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        {heading && <h2>{heading}</h2>}
+      </header>
+    )}
+
+    <div class="stats-grid" data-columns={columns}>
+      {stats.map((stat) => {
+        // Extract numeric portion for animation, preserve non-numeric parts
+        const numericMatch = stat.value.match(/[\d.,]+/);
+        const numericValue = numericMatch ? numericMatch[0] : stat.value;
+        const nonNumeric = stat.value.replace(/[\d.,]+/, "").trim();
+        return (
+        <div class="stat-card">
+          {stat.icon && <div class="stat-icon" aria-hidden="true">{stat.icon}</div>}
+          <div class="stat-value">
+            {stat.prefix && <span class="stat-prefix">{stat.prefix}</span>}
+            <span class="stat-number" data-target={numericValue}>
+              {stat.value}
+            </span>
+            {!stat.suffix && nonNumeric && <span class="stat-suffix">{nonNumeric}</span>}
+            {stat.suffix && <span class="stat-suffix">{stat.suffix}</span>}
+          </div>
+          <p class="stat-label">{stat.label}</p>
+        </div>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+  .section-header .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  .section-header h2 { color: var(--color-primary); }
+
+  .stats-grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .stats-grid[data-columns="2"] { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid[data-columns="3"] { grid-template-columns: repeat(3, 1fr); }
+  .stats-grid[data-columns="4"] { grid-template-columns: repeat(4, 1fr); }
+
+  @media (max-width: 760px) {
+    .stats-grid[data-columns="3"],
+    .stats-grid[data-columns="4"] { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr !important; }
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: var(--space-6);
+  }
+  .stat-icon {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    margin-bottom: var(--space-2);
+  }
+  .stat-number { display: inline; }
+  .stat-label {
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+    font-weight: 500;
+  }
+</style>
+
+<script define:vars={{ animated }}>
+  // Count-up animation
+  if (animated) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const numbers = entry.target.querySelectorAll("[data-target]");
+            numbers.forEach((el) => {
+              const target = parseFloat(el.dataset.target.replace(/,/g, ""));
+              if (isNaN(target)) return;
+              const isInt = Number.isInteger(target);
+              const duration = 2000;
+              const startTime = performance.now();
+              function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+                const current = Math.round(eased * target);
+                el.textContent = (isInt ? current.toLocaleString() : current.toFixed(1));
+                if (progress < 1) requestAnimationFrame(update);
+                else el.textContent = target.toLocaleString();
+              }
+              requestAnimationFrame(update);
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    document.querySelectorAll(".stats-section").forEach((section) => observer.observe(section));
+  }
+</script>

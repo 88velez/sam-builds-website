@@ -1,0 +1,145 @@
+---
+export const prerender = false;
+
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getCollection } from "astro:content";
+import { getLeadStats } from "../../lib/leads";
+import { getAnalyticsSummary } from "../../lib/analytics";
+import { runSEOAudit } from "../../lib/seo-audit";
+
+const blogPosts = (await getCollection("blog", ({ data }) => !data.draft));
+const services = (await getCollection("services"));
+const leadStats = await getLeadStats();
+const analytics = await getAnalyticsSummary(30);
+const seoResult = await runSEOAudit(Astro.url.origin);
+---
+
+<AdminLayout title="Dashboard" activePage="dashboard">
+  <!-- Primary Stat Cards -->
+  <div class="stat-grid-4">
+    <article class="stat-card-inner">
+      <div class="stat-icon-wrap stat-icon-blue" aria-hidden="true">✉</div>
+      <div class="stat-body">
+        <span class="stat-value">{leadStats.unreadCount}</span>
+        <span class="stat-label">{leadStats.unreadCount === 1 ? "Unread Lead" : "Unread Leads"}</span>
+      </div>
+    </article>
+
+    <article class="stat-card-inner">
+      <div class="stat-icon-wrap stat-icon-green" aria-hidden="true">✉</div>
+      <div class="stat-body">
+        <span class="stat-value">{leadStats.totalSubscribers}</span>
+        <span class="stat-label">{leadStats.totalSubscribers === 1 ? "Subscriber" : "Subscribers"}</span>
+      </div>
+    </article>
+
+    <article class="stat-card-inner">
+      <div class="stat-icon-wrap stat-icon-purple" aria-hidden="true">✎</div>
+      <div class="stat-body">
+        <span class="stat-value">{blogPosts.length}</span>
+        <span class="stat-label">{blogPosts.length === 1 ? "Blog Post" : "Blog Posts"}</span>
+      </div>
+    </article>
+
+    <article class="stat-card-inner">
+      <div class="stat-icon-wrap stat-icon-orange" aria-hidden="true">◆</div>
+      <div class="stat-body">
+        <span class="stat-value">{services.length}</span>
+        <span class="stat-label">{services.length === 1 ? "Service" : "Services"}</span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Secondary Stats Grid -->
+  <div class="stat-grid-secondary">
+    <div class="stat-card-sm">
+      <span class="stat-label-sm">Page Views (30d)</span>
+      <span class="stat-value-sm">{analytics.totalViews > 0 ? analytics.totalViews.toLocaleString() : "—"}</span>
+    </div>
+    <div class="stat-card-sm">
+      <span class="stat-label-sm">Visitors (30d)</span>
+      <span class="stat-value-sm">{analytics.uniqueVisitors > 0 ? analytics.uniqueVisitors.toLocaleString() : "—"}</span>
+    </div>
+    <div class="stat-card-sm">
+      <span class="stat-label-sm">SEO Score</span>
+      <span class="stat-value-sm" style={seoResult.score > 0 ? `color: ${seoResult.score >= 80 ? '#16a34a' : seoResult.score >= 50 ? '#d97706' : '#ef4444'}` : ""}>{seoResult.score > 0 ? `${seoResult.score}/100` : "—"}</span>
+    </div>
+    <div class="stat-card-sm">
+      <span class="stat-label-sm">New Leads (Week)</span>
+      <span class="stat-value-sm">{leadStats.submissionsThisWeek > 0 ? leadStats.submissionsThisWeek : "—"}</span>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <section class="admin-card" style="margin-bottom: 1.5rem;">
+    <h2 class="admin-card-title">Quick Actions</h2>
+    <div class="admin-actions-grid">
+      <a href="/admin/blog/new" class="admin-action-card">
+        <span class="admin-action-icon" aria-hidden="true">✎</span>
+        <span class="admin-action-label">Write New Blog Post</span>
+        <span class="admin-action-desc">Create and publish content</span>
+      </a>
+      <a href="/admin/services/new" class="admin-action-card">
+        <span class="admin-action-icon" aria-hidden="true">◆</span>
+        <span class="admin-action-label">Add Service</span>
+        <span class="admin-action-desc">Add a new service offering</span>
+      </a>
+      <a href="/admin/leads" class="admin-action-card">
+        <span class="admin-action-icon" aria-hidden="true">✉</span>
+        <span class="admin-action-label">View Leads {leadStats.unreadCount > 0 ? `(${leadStats.unreadCount} new)` : ""}</span>
+        <span class="admin-action-desc">Check incoming inquiries</span>
+      </a>
+      <a href="/admin/seo" class="admin-action-card">
+        <span class="admin-action-icon" aria-hidden="true">◎</span>
+        <span class="admin-action-label">SEO Audit</span>
+        <span class="admin-action-desc">Review your site's SEO health</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Recent Activity -->
+  <section class="admin-card">
+    <h2 class="admin-card-title">Recent Activity</h2>
+    {leadStats.submissionsThisWeek > 0 || analytics.recentViews.length > 0 ? (
+      <div class="admin-activity-list">
+        {analytics.recentViews.slice(0, 5).map((v) => (
+          <div class="admin-activity-item">
+            <div class="admin-activity-dot" aria-hidden="true"></div>
+            <div class="admin-activity-body">
+              <span class="admin-activity-text">Page visit: <code>{v.path}</code></span>
+              <span class="admin-activity-time">{new Date(v.timestamp).toLocaleString()}</span>
+            </div>
+          </div>
+        ))}
+        {leadStats.submissionsThisWeek > 0 && (
+          <div class="admin-activity-item">
+            <div class="admin-activity-dot admin-activity-dot-accent" aria-hidden="true"></div>
+            <div class="admin-activity-body">
+              <span class="admin-activity-text">{leadStats.submissionsThisWeek} new form {leadStats.submissionsThisWeek === 1 ? "submission" : "submissions"} this week</span>
+              <span class="admin-activity-time"><a href="/admin/leads">View in inbox →</a></span>
+            </div>
+          </div>
+        )}
+        {leadStats.unreadCount > 0 && (
+          <div class="admin-activity-item">
+            <div class="admin-activity-dot admin-activity-dot-danger" aria-hidden="true"></div>
+            <div class="admin-activity-body">
+              <span class="admin-activity-text">{leadStats.unreadCount} unread {leadStats.unreadCount === 1 ? "message" : "messages"}</span>
+              <span class="admin-activity-time"><a href="/admin/leads">View inbox →</a></span>
+            </div>
+          </div>
+        )}
+      </div>
+    ) : (
+      <div class="admin-empty" style="border: none; padding: 2rem;">
+        <div class="admin-empty-icon" aria-hidden="true">◌</div>
+        <p class="admin-empty-title">No recent activity</p>
+        <p class="admin-empty-desc">Activity from leads, page visits, and other actions will appear here.</p>
+      </div>
+    )}
+  </section>
+</AdminLayout>
+
+<style>
+  /* Dashboard-specific styles only */
+</style>

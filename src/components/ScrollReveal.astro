@@ -1,0 +1,37 @@
+---
+interface Props {
+  /** CSS selector for elements to animate */
+  selector?: string;
+  /** Intersection threshold */
+  threshold?: number;
+  /** Root margin */
+  rootMargin?: string;
+}
+
+const { selector = ".anim-fade-in, .anim-fade-in-left, .anim-fade-in-right, .anim-scale-in", threshold = 0.1, rootMargin = "0px 0px -40px 0px" } = Astro.props;
+---
+
+<script define:vars={{ selector, threshold, rootMargin }}>
+  (function() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Add stagger delay based on index among siblings
+            const parent = entry.target.parentElement;
+            const siblings = parent?.querySelectorAll(entry.target.tagName);
+            if (siblings && siblings.length > 1) {
+              const index = Array.from(siblings).indexOf(entry.target);
+              entry.target.style.transitionDelay = `${index * 100}ms`;
+            }
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold, rootMargin }
+    );
+
+    document.querySelectorAll(selector).forEach((el) => observer.observe(el));
+  })();
+</script>

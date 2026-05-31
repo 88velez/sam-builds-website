@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found" noindex={true}>
+  <section class="section" style="text-align:center; min-height: 60vh; display:flex; align-items:center;">
+    <div class="container-narrow">
+      <p class="big">404</p>
+      <h1>Page not found</h1>
+      <p class="lead">The page you're looking for doesn't exist or has moved.</p>
+      <a href="/" class="btn btn-accent">Back to home</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .big {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 20vw, 10rem);
+    color: var(--color-accent);
+    line-height: 1;
+    margin-bottom: var(--space-4);
+  }
+  h1 { color: var(--color-primary); margin-bottom: var(--space-4); }
+  .lead {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-8);
+    margin-inline: auto;
+  }
+</style>

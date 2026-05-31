@@ -1,0 +1,262 @@
+---
+import { site, nav } from "../data/site.config";
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo" aria-label={`${site.name} — Home`}>
+      <img src="/sam-builder-logo.png" alt="Sam Builds Logo" class="logo-img" />
+      <span class="logo-text">{site.name}</span>
+    </a>
+
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+      <ul>
+        {nav.primary.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={["nav-link", { active: currentPath === item.href || (item.href !== "/" && currentPath.startsWith(item.href)) }]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+        <a href={nav.cta.href} class="btn btn-accent nav-cta">{nav.cta.label}</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(8px);
+    transition: background var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-4);
+    gap: var(--space-6);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    text-decoration: none;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  .logo-img {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.22));
+    transition: all var(--duration-base) var(--ease-out);
+  }
+  .logo:hover .logo-img {
+    transform: rotate(5deg) scale(1.05);
+    filter: drop-shadow(0 0 14px rgba(0, 242, 254, 0.45));
+  }
+  .logo-text {
+    background: linear-gradient(135deg, #ffffff 0%, #00f2fe 50%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    filter: drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 10px rgba(0, 242, 254, 0.25));
+    transition: all var(--duration-base) var(--ease-out);
+    display: inline-block;
+  }
+  .logo:hover .logo-text {
+    filter: drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 16px rgba(0, 242, 254, 0.5));
+    transform: translateY(-1px) scale(1.02);
+  }
+
+  .primary-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .primary-nav ul {
+    display: flex;
+    gap: var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .nav-link {
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: var(--text-sm);
+    text-decoration: none;
+    padding: var(--space-2) 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  }
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--color-border);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  .theme-toggle:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-bg-alt);
+  }
+  .theme-toggle .sun-icon { display: block; }
+  .theme-toggle .moon-icon { display: none; }
+  :root.theme-dark .theme-toggle .sun-icon { display: none; }
+  :root.theme-dark .theme-toggle .moon-icon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not(.theme-light) .theme-toggle .sun-icon { display: none; }
+    :root:not(.theme-light) .theme-toggle .moon-icon { display: block; }
+  }
+
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+  }
+  .nav-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-text);
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  @media (max-width: 880px) {
+    .nav-toggle { display: flex; }
+    .primary-nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      background: var(--color-bg);
+      padding: var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+      transform: translateY(-10px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--duration-base) var(--ease-out);
+    }
+    .primary-nav.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .primary-nav ul {
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .nav-actions { flex-direction: row; }
+    .nav-cta { align-self: flex-start; }
+  }
+</style>
+
+<script>
+  // Mobile nav toggle
+  const toggle = document.querySelector(".nav-toggle");
+  const nav = document.querySelector(".primary-nav");
+  toggle?.addEventListener("click", () => {
+    const isOpen = nav?.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", String(!!isOpen));
+  });
+
+  // Theme toggle
+  (function() {
+    const KEY = "theme-preference";
+    const toggle = document.getElementById("theme-toggle");
+    const html = document.documentElement;
+
+    function getTheme() {
+      return localStorage.getItem(KEY) || "system";
+    }
+
+    function applyTheme(theme) {
+      // Dark mode is driven purely by classes so it never touches the
+      // `data-preset` attribute used for color presets.
+      html.classList.remove("theme-light", "theme-dark", "theme-system");
+      if (theme === "dark") {
+        html.classList.add("theme-dark");
+      } else if (theme === "light") {
+        html.classList.add("theme-light");
+      } else {
+        html.classList.add("theme-system");
+      }
+      localStorage.setItem(KEY, theme);
+    }
+
+    // Apply saved preference (the inline <head> script already applied it
+    // pre-paint; this keeps the in-memory state in sync).
+    applyTheme(getTheme());
+
+    toggle?.addEventListener("click", () => {
+      const current = getTheme();
+      const next = current === "light" ? "dark" : current === "dark" ? "system" : "light";
+      applyTheme(next);
+    });
+  })();
+</script>

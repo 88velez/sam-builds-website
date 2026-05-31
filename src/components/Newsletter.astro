@@ -1,0 +1,91 @@
+---
+interface Props {
+  heading?: string;
+  description?: string;
+  placeholder?: string;
+  buttonLabel?: string;
+  successMessage?: string;
+}
+
+const {
+  heading = "Stay in the loop",
+  description = "Get the latest updates, tips, and insights delivered to your inbox.",
+  placeholder = "your@email.com",
+  buttonLabel = "Subscribe",
+  successMessage = "Thanks for subscribing!",
+} = Astro.props;
+---
+
+<section class="newsletter section section-alt">
+  <div class="container-narrow">
+    <div class="newsletter-inner">
+      <h2>{heading}</h2>
+      <p class="newsletter-desc">{description}</p>
+      <form class="newsletter-form" method="POST" data-netlify="true" name="newsletter" action="/thank-you">
+        <input type="hidden" name="form-name" value="newsletter" />
+        <div class="newsletter-input-group">
+          <input
+            type="email"
+            name="email"
+            placeholder={placeholder}
+            required
+            autocomplete="email"
+            aria-label="Email address"
+            class="newsletter-input"
+          />
+          <button type="submit" class="btn btn-accent">{buttonLabel}</button>
+        </div>
+        <p class="newsletter-note">No spam, unsubscribe anytime.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .newsletter-inner {
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-3);
+  }
+  .newsletter-desc {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+  }
+  .newsletter-input-group {
+    display: flex;
+    gap: var(--space-3);
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  .newsletter-input {
+    flex: 1;
+    font-family: inherit;
+    font-size: var(--text-base);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: border-color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .newsletter-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1);
+  }
+  .newsletter-note {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-3);
+  }
+  @media (max-width: 480px) {
+    .newsletter-input-group {
+      flex-direction: column;
+    }
+  }
+</style>

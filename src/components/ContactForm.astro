@@ -1,0 +1,233 @@
+---
+/**
+ * Contact form customized for Sam Builds Websites.
+ * Submits to /api/contact. With JS it posts JSON; without JS it does a normal POST.
+ */
+interface Props {
+  heading?: string;
+  subject?: string;
+}
+const { heading = "Request Your Free Preview", subject = "Free Homepage Mockup Inquiry" } = Astro.props;
+---
+
+<section class="form-wrapper glass-card">
+  {heading && <h3 class="form-heading">{heading}</h3>}
+  <div class="form-status form-success" id="contact-sent" role="status" hidden>
+    Awesome! I've received your request. I'll get back to you shortly to kick off your mockup!
+  </div>
+  <form
+    class="contact-form"
+    id="contact-form"
+    method="POST"
+    action="/api/contact"
+  >
+    <input type="hidden" name="subject" value={subject} />
+    <!-- Honeypot -->
+    <p class="hp" aria-hidden="true">
+      <label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="name">Your Name <span aria-hidden="true">*</span></label>
+        <input id="name" type="text" name="name" required autocomplete="name" placeholder="Samuel Velez" />
+      </div>
+      <div class="field">
+        <label for="email">Business Email <span aria-hidden="true">*</span></label>
+        <input id="email" type="email" name="email" required autocomplete="email" placeholder="sam@example.com" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="phone">Phone Number <span aria-hidden="true">*</span></label>
+        <input id="phone" type="tel" name="phone" required autocomplete="tel" placeholder="(570) 555-0199" />
+      </div>
+      <div class="field">
+        <label for="business-type">Business Type / Industry <span aria-hidden="true">*</span></label>
+        <input id="business-type" type="text" name="businessType" required placeholder="e.g. Roofer, Restaurant, Dentist" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="current-website">Current Website (optional)</label>
+      <input id="current-website" type="url" name="currentWebsite" placeholder="https://mycurrentsite.com" />
+    </div>
+
+    <div class="field">
+      <label for="service">Select Your Service Path</label>
+      <select id="service" name="service">
+        <option value="Free Preview - Professional">Claim Free 48h Mockup (Professional - $3,250) [Recommended]</option>
+        <option value="Free Preview - Starter">Claim Free 48h Mockup (Starter - $1,495)</option>
+        <option value="Free Preview - Premium">Claim Free 48h Mockup (Premium - from $5,500)</option>
+        <option value="Subscription - Pro">Monthly Subscription Interest (Pro - $149/mo)</option>
+        <option value="General Inquiry">General Question / Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="message">Tell me about your business goals <span aria-hidden="true">*</span></label>
+      <textarea id="message" name="message" rows="4" required placeholder="Describe what you want your website to accomplish, any reference sites you like, or questions you have."></textarea>
+    </div>
+
+    <div class="form-status" id="form-status" aria-live="polite" hidden></div>
+
+    <button type="submit" class="btn btn-accent btn-lg" id="form-submit-btn">Build My Free Homepage Preview</button>
+  </form>
+</section>
+
+<script>
+  (function() {
+    const form = document.getElementById("contact-form");
+    const status = document.getElementById("form-status");
+    const submitBtn = document.getElementById("form-submit-btn");
+
+    // Auto-populate packages based on URL query params
+    const params = new URLSearchParams(location.search);
+    const selectEl = document.getElementById("service") as HTMLSelectElement;
+    if (selectEl && params.get("package")) {
+      const pkg = params.get("package");
+      const mode = params.get("mode") || "full";
+      
+      if (pkg === "starter") {
+        selectEl.value = mode === "subscription" ? "Subscription - Starter" : "Free Preview - Starter";
+      } else if (pkg === "professional") {
+        selectEl.value = mode === "subscription" ? "Subscription - Pro" : "Free Preview - Professional";
+      } else if (pkg === "premium") {
+        selectEl.value = mode === "subscription" ? "Subscription - Premium" : "Free Preview - Premium";
+      }
+    }
+
+    if (new URLSearchParams(location.search).get("sent") === "1") {
+      const sent = document.getElementById("contact-sent");
+      if (sent) sent.hidden = false;
+    }
+
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting Request...";
+
+      const formData = new FormData(form as HTMLFormElement);
+      var data = {};
+      formData.forEach(function(value, key) {
+        data[key] = typeof value === "string" ? value : String(value);
+      });
+
+      try {
+        var res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        var result = await res.json();
+        if (result.success) {
+          status.hidden = false;
+          status.className = "form-status form-success";
+          status.textContent = "Awesome! I've received your request. I'll get back to you shortly to kick off your mockup!";
+          (form as HTMLFormElement).reset();
+          setTimeout(function() { status.hidden = true; }, 5000);
+        } else if (result.error) {
+          status.hidden = false;
+          status.className = "form-status form-error";
+          status.textContent = result.error;
+        }
+      } catch (_err) {
+        status.hidden = false;
+        status.className = "form-status form-error";
+        status.textContent = "Something went wrong. Please try again or email us directly at samuel@sambuilds.com.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Build My Free Homepage Preview";
+      }
+    });
+  })();
+</script>
+
+<style>
+  .form-wrapper {
+    padding: var(--space-8);
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(0, 242, 254, 0.1);
+  }
+  .form-heading {
+    color: var(--color-text);
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: var(--space-2);
+  }
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+  @media (max-width: 560px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+  .field { display: flex; flex-direction: column; gap: var(--space-2); }
+  label {
+    font-weight: 600;
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  label span { color: var(--color-accent); }
+  input, select, textarea {
+    font-family: inherit;
+    font-size: var(--text-sm);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    background: rgba(15, 23, 42, 0.4);
+    color: var(--color-text);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+    background: rgba(15, 23, 42, 0.6);
+  }
+  select option {
+    background: #0f172a;
+    color: #ffffff;
+  }
+  textarea { resize: vertical; }
+  .hp { position: absolute; left: -9999px; }
+  button[type="submit"] {
+    align-self: flex-start;
+    margin-top: var(--space-4);
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-status {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+  .form-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success, #10b981);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  .form-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-error, #ef4444);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+</style>

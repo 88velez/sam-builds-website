@@ -1,0 +1,631 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CTABanner from "../components/CTABanner.astro";
+import FAQ from "../components/FAQ.astro";
+import { site } from "../data/site.config";
+
+const pricingFaqs = [
+  {
+    question: "Do I really own the website with the Pay-in-Full option?",
+    answer: "Yes, 100%! Once the final invoice is paid at launch, all files, custom code, and assets are fully transferred to you. There are no ongoing fees or licensing traps. You own it outright."
+  },
+  {
+    question: "What is the commitment for the Monthly Subscription plan?",
+    answer: "Our monthly subscription plans have a 12-month minimum term. This helps cover the intensive custom design and SEO setup work we invest upfront. After 12 months, you can continue month-to-month, cancel, or opt for a buy-out to take full ownership."
+  },
+  {
+    question: "How do care plans work for Pay-in-Full clients?",
+    answer: "If you pay in full, you can handle your own hosting or host with us. Our care plans start at $75/mo (Basic) and cover fast cloud hosting, SSL, daily backups, and security monitoring. Standard & Pro plans include monthly content edit hours."
+  },
+  {
+    question: "Can I upgrade my package or add services later?",
+    answer: "Absolutely! You can start with our Starter package and easily add copywriting, galleries, Google Business Profile setups, or booking features as your budget scales."
+  }
+];
+---
+
+<BaseLayout 
+  title="Pricing & Packages" 
+  description="Transparent web design packages for NEPA businesses. Select Pay-in-Full with complete code ownership, or low upfront monthly subscription plans."
+>
+  <div class="tech-grid">
+    <section class="section page-header text-center">
+      <div class="container">
+        <p class="eyebrow">Clear Pricing, Honest Terms</p>
+        <h1>Choose the way you want to pay.</h1>
+        <p class="section-desc">
+          High-performance, custom-coded web design designed to fit your business cash flow. 
+          Pick a flat build fee to own your site outright, or a low monthly plan that bundles everything together.
+        </p>
+
+        <!-- Dynamic Billing Toggle -->
+        <div class="pricing-toggle-container">
+          <div class="pricing-toggle" role="tablist" aria-label="Pricing Model Selection">
+            <button class="toggle-tab active" id="tab-full" role="tab" aria-selected="true" aria-controls="panel-full" data-target="full">
+              Option A — Pay in Full (Own It)
+            </button>
+            <button class="toggle-tab" id="tab-monthly" role="tab" aria-selected="false" aria-controls="panel-monthly" data-target="monthly">
+              Option B — Monthly Subscription
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Package Panels -->
+  <section class="section packages-section">
+    <div class="container">
+      
+      <!-- Option A: Pay in Full Panel -->
+      <div class="pricing-panel active" id="panel-full" role="tabpanel" aria-labelledby="tab-full">
+        <div class="panel-intro text-center mb-12">
+          <h3>Flat Build Fees — Complete Ownership</h3>
+          <p>Pay 50% upfront to reserve timeline and start design, 50% at launch. Complete ownership of code and assets.</p>
+        </div>
+        
+        <div class="packages-grid">
+          <!-- Starter -->
+          <article class="glass-card package-card">
+            <div class="package-header">
+              <h4 class="package-name">Starter</h4>
+              <p class="package-tag">Perfect for local businesses wanting a high-converting storefront.</p>
+              <div class="price-box">
+                <span class="price-currency">$</span>
+                <span class="price-value">1,495</span>
+                <span class="price-term">one-time</span>
+              </div>
+            </div>
+            <ul class="package-features">
+              <li><strong>3–5 Pages</strong> Custom Code</li>
+              <li>100% Mobile Responsive</li>
+              <li>Custom Contact Form</li>
+              <li>Google Map & Social Links</li>
+              <li>Click-to-Call Buttons</li>
+              <li>Basic On-Page Local SEO</li>
+              <li>Full Code Ownership</li>
+            </ul>
+            <div class="package-action">
+              <a href="/contact?package=starter&mode=full" class="btn btn-outline">Claim Free Mockup</a>
+            </div>
+          </article>
+
+          <!-- Professional -->
+          <article class="glass-card package-card featured">
+            <span class="card-badge">Most Popular</span>
+            <div class="package-header">
+              <h4 class="package-name">Professional</h4>
+              <p class="package-tag">Best for growing trade and service brands who want to rank on Google.</p>
+              <div class="price-box">
+                <span class="price-currency">$</span>
+                <span class="price-value">3,250</span>
+                <span class="price-term">one-time</span>
+              </div>
+            </div>
+            <ul class="package-features">
+              <li><strong>Everything in Starter</strong></li>
+              <li><strong>Up to 8 Pages</strong> custom design</li>
+              <li>Professional Copywriting Help</li>
+              <li>Interactive Photo / Project Gallery</li>
+              <li><strong>Full Local SEO Setup</strong></li>
+              <li>Google Business Profile Setup</li>
+              <li>Local Structured-Data Schema</li>
+            </ul>
+            <div class="package-action">
+              <a href="/contact?package=professional&mode=full" class="btn btn-accent">Claim Free Mockup</a>
+            </div>
+          </article>
+
+          <!-- Premium -->
+          <article class="glass-card package-card">
+            <div class="package-header">
+              <h4 class="package-name">Premium</h4>
+              <p class="package-tag">For businesses needing advanced booking, ordering, or custom APIs.</p>
+              <div class="price-box">
+                <span class="price-currency">from</span>
+                <span class="price-value">$5.5K</span>
+                <span class="price-term">one-time</span>
+              </div>
+            </div>
+            <ul class="package-features">
+              <li><strong>Everything in Professional</strong></li>
+              <li>Online Ordering / Restaurant Menus</li>
+              <li>E-commerce / Product Catalog</li>
+              <li>Advanced Scheduling & Booking</li>
+              <li>Multi-page Service Area SEO</li>
+              <li>Third-party API & Database integrations</li>
+              <li>1-on-1 Growth Consultation</li>
+            </ul>
+            <div class="package-action">
+              <a href="/contact?package=premium&mode=full" class="btn btn-outline">Request Custom Quote</a>
+            </div>
+          </article>
+        </div>
+
+        <!-- Care Plans Grid (For Pay-in-Full Clients) -->
+        <div class="care-plans-wrapper mt-24">
+          <div class="section-header text-center mb-12">
+            <p class="eyebrow">Hosting & Support</p>
+            <h3>Ongoing Website Care Plans</h3>
+            <p class="section-desc max-w-60">Keep your website ultra-fast, protected, and fully updated without lifting a finger.</p>
+          </div>
+          
+          <div class="care-grid">
+            <div class="glass-card care-card">
+              <h4>Basic Care</h4>
+              <div class="care-price">$75<span>/mo</span></div>
+              <ul class="care-features">
+                <li>High-Speed Cloud Hosting</li>
+                <li>SSL Security Certificate</li>
+                <li>Daily Automated Backups</li>
+                <li>24/7 Security & Uptime Monitoring</li>
+              </ul>
+            </div>
+            
+            <div class="glass-card care-card featured-care">
+              <span class="care-badge">Best Value</span>
+              <h4>Standard Care</h4>
+              <div class="care-price">$125<span>/mo</span></div>
+              <ul class="care-features">
+                <li><strong>Everything in Basic Care</strong></li>
+                <li><strong>Up to 1 hour</strong> of content edits per month</li>
+                <li>Text, photos, and menu updates</li>
+                <li>Monthly plugin & system audits</li>
+              </ul>
+            </div>
+
+            <div class="glass-card care-card">
+              <h4>Pro Care</h4>
+              <div class="care-price">$175<span>/mo</span></div>
+              <ul class="care-features">
+                <li><strong>Everything in Standard Care</strong></li>
+                <li><strong>Up to 2 hours</strong> of edits per month</li>
+                <li>Priority 24-hour edit turnaround</li>
+                <li>Quarterly performance & SEO check</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option B: Monthly Subscription Panel -->
+      <div class="pricing-panel" id="panel-monthly" role="tabpanel" aria-labelledby="tab-monthly">
+        <div class="panel-intro text-center mb-12">
+          <h3>Predictable Monthly Subscriptions — Low Upfront</h3>
+          <p>Get a high-performance website, reliable hosting, updates, and care wrapped into a simple monthly rate. 12-month minimum.</p>
+        </div>
+
+        <div class="packages-grid">
+          <!-- Subscription Starter -->
+          <article class="glass-card package-card">
+            <div class="package-header">
+              <h4 class="package-name">Subscription Starter</h4>
+              <p class="package-tag">Starter-level site with care, hosting, and domain support built-in.</p>
+              <div class="price-box">
+                <span class="price-value">$99</span>
+                <span class="price-term">/mo</span>
+              </div>
+              <p class="setup-fee"><strong>$499</strong> Setup Fee</p>
+            </div>
+            <ul class="package-features">
+              <li><strong>Starter Website</strong> (3-5 Pages)</li>
+              <li>Premium Cloud Hosting & SSL</li>
+              <li>Automated Backups & Security</li>
+              <li>Small content edits on request</li>
+              <li>Includes domain alignment</li>
+              <li>No buy-out obligation</li>
+            </ul>
+            <div class="package-action">
+              <a href="/contact?package=starter&mode=subscription" class="btn btn-outline">Claim Free Mockup</a>
+            </div>
+          </article>
+
+          <!-- Subscription Professional -->
+          <article class="glass-card package-card featured">
+            <span class="card-badge">Best Choice</span>
+            <div class="package-header">
+              <h4 class="package-name">Subscription Pro</h4>
+              <p class="package-tag">Pro-level design with full copywriting, active local SEO, and monthly updates.</p>
+              <div class="price-box">
+                <span class="price-value">$149</span>
+                <span class="price-term">/mo</span>
+              </div>
+              <p class="setup-fee"><strong>$699</strong> Setup Fee</p>
+            </div>
+            <ul class="package-features">
+              <li><strong>Professional Website</strong> (Up to 8 Pages)</li>
+              <li>Premium Hosting & Full Security Care</li>
+              <li><strong>Ongoing Monthly Content Edits</strong></li>
+              <li>Local SEO & Schema Maintenance</li>
+              <li>Google Business Profile Optimization</li>
+              <li>Priority support response</li>
+            </ul>
+            <div class="package-action">
+              <a href="/contact?package=professional&mode=subscription" class="btn btn-accent">Claim Free Mockup</a>
+            </div>
+          </article>
+
+          <!-- Subscription Premium -->
+          <article class="glass-card package-card">
+            <div class="package-header">
+              <h4 class="package-name">Subscription Premium</h4>
+              <p class="package-tag">Full features with online booking/ordering systems and monthly growth support.</p>
+              <div class="price-box">
+                <span class="price-value">$199</span>
+                <span class="price-term">/mo</span>
+              </div>
+              <p class="setup-fee"><strong>$999</strong> Setup Fee</p>
+            </div>
+            <ul class="package-features">
+              <li><strong>Premium Website Features</strong></li>
+              <li>Booking, ordering, or catalog setup</li>
+              <li>Active monthly SEO updates & reports</li>
+              <li>Priority 24h support ticket handling</li>
+              <li>Regular schema & layout optimizations</li>
+              <li>Quarterly marketing audit & advice</li>
+            </ul>
+            <div class="package-action">
+              <a href="/contact?package=premium&mode=subscription" class="btn btn-outline">Request Mockup</a>
+            </div>
+          </article>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Add-ons Section -->
+  <section class="section section-alt addons-section">
+    <div class="container">
+      <div class="section-header text-center mb-12">
+        <p class="eyebrow">Tailor Your Build</p>
+        <h3>À La Carte Services</h3>
+        <p class="section-desc">Need something extra? Add these individual services to any custom build package.</p>
+      </div>
+
+      <div class="addons-grid">
+        <div class="addon-card glass-card">
+          <div class="addon-info">
+            <h5>Logo & Branding Design</h5>
+            <p>Professional logo icon, selected typography presets, and harmonious colors tailored to your trades or shop.</p>
+          </div>
+          <span class="addon-price">$250–$500</span>
+        </div>
+
+        <div class="addon-card glass-card">
+          <div class="addon-info">
+            <h5>Copywriting Assistance</h5>
+            <p>Custom sales-focused, SEO-optimized text written specifically around your local business services (per page).</p>
+          </div>
+          <span class="addon-price">$75 / page</span>
+        </div>
+
+        <div class="addon-card glass-card">
+          <div class="addon-info">
+            <h5>Google Business Profile Setup</h5>
+            <p>Complete creation or optimization of your local Google Map listing, reviews config, and photo uploads.</p>
+          </div>
+          <span class="addon-price">$200</span>
+        </div>
+
+        <div class="addon-card glass-card">
+          <div class="addon-info">
+            <h5>Interactive Booking & Reservations</h5>
+            <p>Direct calendar integrations allowing customers to schedule appointments or book a table straight from your site.</p>
+          </div>
+          <span class="addon-price">from $500</span>
+        </div>
+
+        <div class="addon-card glass-card">
+          <div class="addon-info">
+            <h5>Active Local SEO Program</h5>
+            <p>Ongoing monthly localized blog writing, profile optimization, and schema tweaks to climb Google rankings.</p>
+          </div>
+          <span class="addon-price">from $200/mo</span>
+        </div>
+
+        <div class="addon-card glass-card">
+          <div class="addon-info">
+            <h5>24/48h Rush Delivery</h5>
+            <p>Need your site live for a trade show, grand opening, or season launch? Expedite completion by jumping line.</p>
+          </div>
+          <span class="addon-price">+25% of build</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FAQ faqs={pricingFaqs} />
+
+  <CTABanner heading="Ready to see your site before spending a dollar?" description="Claim your free 48-hour homepage mockup. Zero obligation, zero payment details required." />
+</BaseLayout>
+
+<style>
+  .text-center { text-align: center; }
+  .mb-12 { margin-bottom: var(--space-12); }
+  .mt-24 { margin-top: var(--space-24); }
+
+  .page-header {
+    padding-block: clamp(var(--space-12), 10vw, var(--space-24));
+  }
+  .page-header h1 {
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+  .section-desc {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    max-width: 65ch;
+    margin-inline: auto;
+  }
+  .max-w-60 { max-width: 60ch; }
+
+  /* Pricing Toggle */
+  .pricing-toggle-container {
+    margin-top: var(--space-8);
+    display: flex;
+    justify-content: center;
+  }
+  .pricing-toggle {
+    display: flex;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: var(--space-1);
+    border-radius: var(--radius-full);
+  }
+  .toggle-tab {
+    padding: var(--space-2) var(--space-6);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--duration-base) var(--ease-out);
+  }
+  .toggle-tab.active {
+    background: linear-gradient(135deg, var(--color-accent) 0%, #8b5cf6 100%);
+    color: #030712;
+    box-shadow: 0 4px 14px rgba(0, 242, 254, 0.3);
+  }
+
+  /* Pricing Panel Switch */
+  .pricing-panel {
+    display: none;
+  }
+  .pricing-panel.active {
+    display: block;
+  }
+
+  /* Packages Grid */
+  .packages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-8);
+    align-items: stretch;
+  }
+  .package-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-8);
+    position: relative;
+    background: rgba(15, 23, 42, 0.4);
+  }
+  .package-card.featured {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.15);
+    background: rgba(15, 23, 42, 0.7);
+  }
+  .card-badge {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    background: linear-gradient(135deg, var(--color-accent) 0%, #8b5cf6 100%);
+    color: #030712;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  .package-header {
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .package-name {
+    font-size: var(--text-2xl);
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+  }
+  .package-tag {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+  .price-box {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+  }
+  .price-currency {
+    font-size: var(--text-xl);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  .price-value {
+    font-family: var(--font-display);
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .price-term {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .setup-fee {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    margin-top: var(--space-2);
+  }
+
+  .package-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-8) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex-grow: 1;
+  }
+  .package-features li {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .package-features li::before {
+    content: "✓";
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .package-action .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Care Plans Grid */
+  .care-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+  .care-card {
+    padding: var(--space-6);
+    background: rgba(15, 23, 42, 0.3);
+  }
+  .care-card.featured-care {
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    position: relative;
+  }
+  .care-badge {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #c084fc;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+  .care-card h4 {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+  }
+  .care-price {
+    font-size: var(--text-3xl);
+    font-family: var(--font-display);
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+  }
+  .care-price span {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .care-features {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .care-features li {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+  .care-features li::before {
+    content: "•";
+    color: var(--color-accent);
+    margin-right: var(--space-2);
+  }
+
+  /* Addons Grid */
+  .addons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-6);
+  }
+  .addon-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: rgba(15, 23, 42, 0.4);
+  }
+  .addon-info h5 {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+  .addon-info p {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+  .addon-price {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    white-space: nowrap;
+    background: rgba(0, 242, 254, 0.1);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .addons-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  // Tab control logic
+  const tabButtons = document.querySelectorAll(".toggle-tab");
+  const panels = document.querySelectorAll(".pricing-panel");
+
+  tabButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      // Deactivate all buttons
+      tabButtons.forEach(btn => {
+        btn.classList.remove("active");
+        btn.setAttribute("aria-selected", "false");
+      });
+
+      // Activate clicked button
+      button.classList.add("active");
+      button.setAttribute("aria-selected", "true");
+
+      // Hide all panels
+      panels.forEach(panel => {
+        panel.classList.remove("active");
+      });
+
+      // Show targeted panel
+      const targetId = `panel-${(button as HTMLElement).dataset.target}`;
+      const targetPanel = document.getElementById(targetId);
+      if (targetPanel) {
+        targetPanel.classList.add("active");
+      }
+    });
+  });
+</script>

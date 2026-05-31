@@ -1,0 +1,577 @@
+---
+export const prerender = false;
+
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="Analytics" activePage="analytics">
+  <!-- Period selector -->
+  <div class="period-bar">
+    <div class="period-btns" id="period-btns">
+      <button class="period-btn active" data-days="7">7 days</button>
+      <button class="period-btn" data-days="30">30 days</button>
+      <button class="period-btn" data-days="90">90 days</button>
+    </div>
+    <button class="btn btn-outline" id="refresh-btn">⟳ Refresh</button>
+  </div>
+
+  <!-- Stats grid -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Views</div>
+      <div class="stat-number" id="stat-views">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unique Visitors</div>
+      <div class="stat-number" id="stat-visitors">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pages / Visit</div>
+      <div class="stat-number" id="stat-pages-per-visit">—</div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-label">Today</div>
+      <div class="stat-number" id="stat-today">—</div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card" id="chart-card">
+    <h3 class="card-title">Views Over Time</h3>
+    <div class="chart-container">
+      <div class="bar-chart" id="bar-chart"></div>
+    </div>
+  </div>
+
+  <!-- Bottom grid: Top Pages + Sources -->
+  <div class="bottom-grid">
+    <div class="card">
+      <h3 class="card-title">Top Pages</h3>
+      <div class="top-list" id="top-pages"></div>
+    </div>
+    <div class="card">
+      <h3 class="card-title">Traffic Sources</h3>
+      <div class="top-list" id="top-sources"></div>
+    </div>
+  </div>
+
+  <!-- UTM Builder -->
+  <div class="card" id="utm-card">
+    <h3 class="card-title">UTM Link Builder</h3>
+    <form id="utm-form" class="utm-form">
+      <div class="utm-grid">
+        <div class="field">
+          <label for="utm-url">Page URL <span class="required">*</span></label>
+          <input id="utm-url" type="url" class="input" required placeholder="https://yoursite.com/page" />
+        </div>
+        <div class="field">
+          <label for="utm-source">Source <span class="required">*</span></label>
+          <input id="utm-source" type="text" class="input" required placeholder="e.g. google, newsletter, twitter" />
+        </div>
+        <div class="field">
+          <label for="utm-medium">Medium <span class="required">*</span></label>
+          <input id="utm-medium" type="text" class="input" required placeholder="e.g. cpc, email, social" />
+        </div>
+        <div class="field">
+          <label for="utm-campaign">Campaign <span class="required">*</span></label>
+          <input id="utm-campaign" type="text" class="input" required placeholder="e.g. spring_sale" />
+        </div>
+        <div class="field">
+          <label for="utm-term">Term</label>
+          <input id="utm-term" type="text" class="input" placeholder="e.g. running+shoes" />
+        </div>
+        <div class="field">
+          <label for="utm-content">Content</label>
+          <input id="utm-content" type="text" class="input" placeholder="e.g. hero_cta" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-accent" id="generate-utm-btn">Generate UTM Link</button>
+      </div>
+    </form>
+
+    <div class="utm-result" id="utm-result" style="display:none">
+      <label>Generated URL</label>
+      <div class="utm-url-display">
+        <code id="utm-generated-url"></code>
+        <button class="btn btn-sm btn-outline" id="copy-utm-btn">Copy</button>
+      </div>
+    </div>
+
+    <div class="utm-history" id="utm-history">
+      <h4 class="subtitle">Recent UTM Links</h4>
+      <div id="utm-links-list"></div>
+    </div>
+  </div>
+
+  <div class="admin-toast" id="toast" role="alert" aria-live="polite" hidden></div>
+</AdminLayout>
+
+<script>
+  (function() {
+    const toast = document.getElementById("toast");
+    let currentDays = 7;
+
+    // ---- Period buttons ----
+    document.querySelectorAll(".period-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".period-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentDays = parseInt(btn.dataset.days, 10);
+        loadData(currentDays);
+      });
+    });
+
+    // ---- Load data ----
+    async function loadData(days) {
+      try {
+        const res = await fetch("/api/admin/analytics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "get-summary", days }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          renderSummary(data.summary);
+        }
+      } catch {
+        showToast("Failed to load analytics data.", "error");
+      }
+    }
+
+    function renderSummary(summary) {
+      document.getElementById("stat-views").textContent = summary.totalViews.toLocaleString();
+      document.getElementById("stat-visitors").textContent = summary.uniqueVisitors.toLocaleString();
+
+      const ppv = summary.totalViews > 0 ? (summary.totalViews / summary.uniqueVisitors).toFixed(1) : "0";
+      document.getElementById("stat-pages-per-visit").textContent = ppv;
+
+      const today = summary.viewsByDay[summary.viewsByDay.length - 1]?.count || 0;
+      document.getElementById("stat-today").textContent = today.toLocaleString();
+
+      // Bar chart
+      renderBarChart(summary.viewsByDay);
+
+      // Top pages
+      const pagesEl = document.getElementById("top-pages");
+      if (summary.topPages.length === 0) {
+        pagesEl.innerHTML = '<p class="empty-note">No data yet</p>';
+      } else {
+        pagesEl.innerHTML = summary.topPages.map(p => `
+          <div class="top-item">
+            <span class="top-item-label">${escapeHtml(p.path)}</span>
+            <div class="top-item-bar-wrap">
+              <div class="top-item-bar" style="width: ${(p.count / summary.topPages[0].count) * 100}%"></div>
+            </div>
+            <span class="top-item-count">${p.count}</span>
+          </div>
+        `).join("");
+      }
+
+      // Top sources
+      const sourcesEl = document.getElementById("top-sources");
+      if (summary.topSources.length === 0) {
+        sourcesEl.innerHTML = '<p class="empty-note">No data yet</p>';
+      } else {
+        const maxSource = summary.topSources[0]?.count || 1;
+        sourcesEl.innerHTML = summary.topSources.map(s => `
+          <div class="top-item">
+            <span class="top-item-label">${escapeHtml(s.source)}</span>
+            <div class="top-item-bar-wrap">
+              <div class="top-item-bar bar-source" style="width: ${(s.count / maxSource) * 100}%"></div>
+            </div>
+            <span class="top-item-count">${s.count}</span>
+          </div>
+        `).join("");
+      }
+    }
+
+    function renderBarChart(viewsByDay) {
+      const container = document.getElementById("bar-chart");
+      if (!viewsByDay || viewsByDay.length === 0) {
+        container.innerHTML = '<p class="empty-note">No data for this period</p>';
+        return;
+      }
+
+      const maxCount = Math.max(...viewsByDay.map(d => d.count), 1);
+      container.innerHTML = viewsByDay.map(d => {
+        const height = (d.count / maxCount) * 100;
+        const dayLabel = new Date(d.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+        return `
+          <div class="bar-item" title="${dayLabel}: ${d.count} views">
+            <div class="bar" style="height: ${Math.max(height, 1)}%"></div>
+            <span class="bar-label">${new Date(d.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ---- Refresh ----
+    document.getElementById("refresh-btn")?.addEventListener("click", () => loadData(currentDays));
+
+    // ---- UTM Builder ----
+    document.getElementById("utm-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("generate-utm-btn");
+      btn.disabled = true;
+      btn.textContent = "Generating…";
+
+      const url = document.getElementById("utm-url").value;
+      const source = document.getElementById("utm-source").value;
+      const medium = document.getElementById("utm-medium").value;
+      const campaign = document.getElementById("utm-campaign").value;
+      const term = document.getElementById("utm-term").value;
+      const content = document.getElementById("utm-content").value;
+
+      try {
+        const res = await fetch("/api/admin/analytics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "generate-utm", url, source, medium, campaign, term, content }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById("utm-generated-url").textContent = data.utmUrl;
+          document.getElementById("utm-result").style.display = "block";
+          loadUTMLinks();
+          showToast("UTM link generated!", "success");
+        } else {
+          showToast(data.error || "Failed to generate UTM link.", "error");
+        }
+      } catch {
+        showToast("Network error.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Generate UTM Link";
+      }
+    });
+
+    // ---- Copy UTM URL ----
+    document.getElementById("copy-utm-btn")?.addEventListener("click", () => {
+      const urlEl = document.getElementById("utm-generated-url");
+      navigator.clipboard.writeText(urlEl.textContent).then(() => {
+        showToast("Copied to clipboard!", "success");
+      }).catch(() => {
+        // Fallback
+        const range = document.createRange();
+        range.selectNodeContents(urlEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      });
+    });
+
+    // ---- Load UTM links ----
+    async function loadUTMLinks() {
+      try {
+        const res = await fetch("/api/admin/analytics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "list-utms" }),
+        });
+        const data = await res.json();
+
+        if (data.success && data.links.length > 0) {
+          const list = document.getElementById("utm-links-list");
+          list.innerHTML = data.links.slice(0, 10).map(link => {
+            const fullUrl = generateUTMString(link.url, link.utm);
+            return `
+              <div class="utm-link-item">
+                <div class="utm-link-info">
+                  <strong>${escapeHtml(link.utm.campaign)}</strong>
+                  <code>${escapeHtml(fullUrl)}</code>
+                </div>
+                <div class="utm-link-meta">
+                  <span>${link.utm.source} / ${link.utm.medium}</span>
+                  <span>${new Date(link.createdAt).toLocaleDateString()}</span>
+                </div>
+                <button class="btn btn-sm btn-outline btn-danger delete-utm" data-id="${link.id}">Delete</button>
+              </div>
+            `;
+          }).join("");
+
+          list.querySelectorAll(".delete-utm").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              const id = btn.dataset.id;
+              const res = await fetch("/api/admin/analytics", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "delete-utm", id }),
+              });
+              const data = await res.json();
+              if (data.success) {
+                loadUTMLinks();
+                showToast("UTM link deleted.", "info");
+              }
+            });
+          });
+        } else {
+          document.getElementById("utm-links-list").innerHTML = '<p class="empty-note">No UTM links yet</p>';
+        }
+      } catch {}
+    }
+
+    function generateUTMString(url, utm) {
+      const u = new URL(url);
+      u.searchParams.set("utm_source", utm.source);
+      u.searchParams.set("utm_medium", utm.medium);
+      u.searchParams.set("utm_campaign", utm.campaign);
+      if (utm.term) u.searchParams.set("utm_term", utm.term);
+      if (utm.content) u.searchParams.set("utm_content", utm.content);
+      return u.toString();
+    }
+
+    function showToast(message, type = "info") {
+      if (!toast) return;
+      toast.textContent = message;
+      toast.className = "admin-toast admin-toast-" + type;
+      toast.hidden = false;
+      setTimeout(() => { toast.hidden = true; }, 4000);
+    }
+
+    // ---- Init ----
+    loadData(7);
+    loadUTMLinks();
+  })();
+</script>
+
+<style>
+  .period-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .period-btns {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--color-bg, #ffffff);
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-radius: 10px;
+    padding: 0.25rem;
+  }
+
+  .period-btn {
+    padding: 0.375rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    color: var(--color-text-muted, #5a5a5a);
+    cursor: pointer;
+    transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .period-btn:hover { color: var(--color-text, #1a1a1a); }
+  .period-btn.active {
+    background: var(--color-primary, #1a3a5c);
+    color: var(--color-text-inverse, #ffffff);
+  }
+
+  .stat-card.accent {
+    border-color: var(--color-accent, #d97706);
+    background: linear-gradient(135deg, rgba(217,119,6,0.03), transparent);
+  }
+
+  .chart-container {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.25rem;
+    height: 160px;
+    min-width: 400px;
+  }
+
+  .bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    gap: 0.25rem;
+  }
+
+  .bar {
+    width: 100%;
+    max-width: 40px;
+    min-height: 2px;
+    background: var(--color-primary, #1a3a5c);
+    border-radius: 3px 3px 0 0;
+    transition: height 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: help;
+  }
+
+  .bar:hover {
+    background: var(--color-accent, #d97706);
+  }
+
+  .bar-label {
+    font-size: 0.625rem;
+    color: var(--color-text-muted, #5a5a5a);
+    white-space: nowrap;
+    transform: rotate(-45deg);
+    transform-origin: left;
+    margin-top: 0.25rem;
+  }
+
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 700px) {
+    .bottom-grid { grid-template-columns: 1fr; }
+  }
+
+  .top-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .top-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .top-item-label {
+    font-size: 0.8125rem;
+    color: var(--color-text, #1a1a1a);
+    width: 140px;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .top-item-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: var(--color-bg-alt, #f7f7f5);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .top-item-bar {
+    height: 100%;
+    background: var(--color-primary, #1a3a5c);
+    border-radius: 9999px;
+    transition: width 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .top-item-bar.bar-source {
+    background: var(--color-accent, #d97706);
+  }
+
+  .top-item-count {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #5a5a5a);
+    width: 40px;
+    text-align: right;
+  }
+
+  /* UTM Builder */
+  .utm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .utm-grid { grid-template-columns: 1fr; }
+  }
+
+  .utm-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--color-bg-alt, #f7f7f5);
+    border-radius: 10px;
+  }
+
+  .utm-result label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-primary, #1a3a5c);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .utm-url-display {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .utm-url-display code {
+    flex: 1;
+    font-size: 0.8125rem;
+    word-break: break-all;
+    padding: 0.5rem;
+    background: var(--color-bg, #ffffff);
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-radius: 6px;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text, #1a1a1a);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .utm-link-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border, #e5e5e5);
+  }
+
+  .utm-link-item:last-child { border-bottom: none; }
+
+  .utm-link-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .utm-link-info strong {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--color-text, #1a1a1a);
+    margin-bottom: 0.125rem;
+  }
+
+  .utm-link-info code {
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #5a5a5a);
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .utm-link-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    font-size: 0.6875rem;
+    color: var(--color-text-muted, #5a5a5a);
+    text-align: right;
+    flex-shrink: 0;
+  }
+</style>

@@ -1,0 +1,91 @@
+---
+interface Feature {
+  title: string;
+  description: string;
+  icon?: string;       // optional emoji or SVG path
+  href?: string;
+}
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  features: Feature[];
+  columns?: 2 | 3 | 4;
+}
+const { eyebrow, heading, features, columns = 3 } = Astro.props;
+---
+
+<section class="section feature-grid">
+  <div class="container">
+    {(eyebrow || heading) && (
+      <header class="section-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        {heading && <h2>{heading}</h2>}
+      </header>
+    )}
+    <div class="grid" data-columns={columns}>
+      {features.map((f) => (
+        <article class="feature-card">
+          {f.icon && <div class="feature-icon" aria-hidden="true">{f.icon}</div>}
+          <h3>{f.title}</h3>
+          <p>{f.description}</p>
+          {f.href && <a href={f.href} class="feature-link">Learn more →</a>}
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .section-header .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  .section-header h2 { color: var(--color-primary); }
+
+  .grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .grid[data-columns="2"] { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .grid[data-columns="3"] { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .grid[data-columns="4"] { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+  .feature-card {
+    padding: var(--space-8);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: transform var(--duration-base) var(--ease-out),
+                box-shadow var(--duration-base) var(--ease-out);
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  .feature-icon {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
+  }
+  .feature-card h3 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-3);
+  }
+  .feature-card p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+  .feature-link {
+    font-weight: 600;
+    font-size: var(--text-sm);
+  }
+</style>

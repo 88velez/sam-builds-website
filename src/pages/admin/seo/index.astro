@@ -1,0 +1,579 @@
+---
+export const prerender = false;
+
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+
+const scannedPages = [
+  { url: "/", label: "Home" },
+  { url: "/about", label: "About" },
+  { url: "/services", label: "Services" },
+  { url: "/contact", label: "Contact" },
+  { url: "/blog", label: "Blog" },
+  { url: "/gallery", label: "Gallery" },
+  { url: "/privacy", label: "Privacy" },
+  { url: "/terms", label: "Terms" },
+];
+---
+
+<AdminLayout title="SEO Dashboard" activePage="seo">
+  <!-- Score overview -->
+  <div class="seo-grid">
+    <div class="card score-card" id="score-card">
+      <div class="score-ring-container">
+        <svg class="score-ring" viewBox="0 0 120 120">
+          <circle class="score-ring-bg" cx="60" cy="60" r="54" />
+          <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="54" />
+        </svg>
+        <div class="score-text">
+          <span class="score-value" id="score-value">—</span>
+          <span class="score-label" id="score-label">Loading…</span>
+        </div>
+      </div>
+      <div class="score-summary" id="score-summary">
+        <span class="stat-item"><strong id="issue-critical">0</strong> critical</span>
+        <span class="stat-item"><strong id="issue-warning">0</strong> warnings</span>
+        <span class="stat-item"><strong id="issue-info">0</strong> info</span>
+      </div>
+      <button class="btn btn-accent" id="run-audit-btn">⟳ Run Full Audit</button>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Quick Checks</h3>
+      <ul class="quick-checks" id="quick-checks">
+        <li class="check-item pending" data-check="title">
+          <span class="check-icon">○</span>
+          <span class="check-label">Page Titles</span>
+        </li>
+        <li class="check-item pending" data-check="description">
+          <span class="check-icon">○</span>
+          <span class="check-label">Meta Descriptions</span>
+        </li>
+        <li class="check-item pending" data-check="headings">
+          <span class="check-icon">○</span>
+          <span class="check-label">Heading Structure</span>
+        </li>
+        <li class="check-item pending" data-check="images">
+          <span class="check-icon">○</span>
+          <span class="check-label">Image Alt Text</span>
+        </li>
+        <li class="check-item pending" data-check="og">
+          <span class="check-icon">○</span>
+          <span class="check-label">Open Graph Tags</span>
+        </li>
+        <li class="check-item pending" data-check="canonical">
+          <span class="check-icon">○</span>
+          <span class="check-label">Canonical URLs</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Issues list -->
+  <div class="card" id="issues-card" style="display:none">
+    <h3 class="card-title">Issues Found</h3>
+    <div id="issues-list"></div>
+  </div>
+
+  <!-- Tabs: Settings | Robots.txt | Page Overrides -->
+  <div class="tabs" id="seo-tabs">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="settings">Site Settings</button>
+      <button class="tab-btn" data-tab="robots">Robots.txt</button>
+      <button class="tab-btn" data-tab="overrides">Page Overrides</button>
+    </div>
+
+    <!-- Tab: Site Settings -->
+    <div class="tab-panel active" id="tab-settings">
+      <form id="settings-form" class="settings-form">
+        <div class="field">
+          <label for="site-title">Site Title</label>
+          <input id="site-title" name="siteTitle" type="text" class="input" placeholder="Your business name" />
+        </div>
+        <div class="field">
+          <label for="site-description">Site Description</label>
+          <textarea id="site-description" name="siteDescription" class="input textarea" rows="3" placeholder="Describe your site for search engines"></textarea>
+        </div>
+        <div class="field">
+          <label for="og-image">Default OG Image URL</label>
+          <input id="og-image" name="defaultOgImage" type="text" class="input" placeholder="/og-default.jpg" />
+        </div>
+        <div class="field">
+          <label for="track-keywords">Tracked Keywords (one per line)</label>
+          <textarea id="track-keywords" name="trackKeywords" class="input textarea textarea-sm" rows="4" placeholder="Enter keywords to track rankings..."></textarea>
+        </div>
+        <div class="field checkbox-field">
+          <label class="checkbox-label">
+            <input type="checkbox" name="enableJsonLd" value="true" checked />
+            <span>Enable JSON-LD structured data</span>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-accent" id="save-settings-btn">Save Settings</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab: Robots.txt -->
+    <div class="tab-panel" id="tab-robots">
+      <div class="robots-header">
+        <p class="field-hint">This controls how search engine crawlers access your site. Changes take effect immediately.</p>
+      </div>
+      <form id="robots-form">
+        <div class="field">
+          <textarea id="robots-editor" class="input textarea textarea-mono" rows="16"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-accent" id="save-robots-btn">Save robots.txt</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab: Page Overrides -->
+    <div class="tab-panel" id="tab-overrides">
+      <p class="field-hint">Override individual page meta data for better search performance.</p>
+      <div class="overrides-list" id="overrides-list">
+        {scannedPages.map((page) => (
+          <div class="override-item" data-url={page.url}>
+            <div class="override-header">
+              <span class="override-url">{page.url}</span>
+              <span class="override-page-label">{page.label}</span>
+              <button type="button" class="btn btn-sm btn-outline toggle-override">Edit</button>
+            </div>
+            <div class="override-body" style="display:none">
+              <div class="field">
+                <label>Meta Title</label>
+                <input type="text" class="input input-sm override-title" placeholder="Custom title for this page" />
+              </div>
+              <div class="field">
+                <label>Meta Description</label>
+                <textarea class="input textarea input-sm override-description" rows="2" placeholder="Custom description"></textarea>
+              </div>
+              <div class="field">
+                <label>OG Image URL</label>
+                <input type="text" class="input input-sm override-og-image" placeholder="/custom-og-image.jpg" />
+              </div>
+              <div class="field-row-inline">
+                <div class="field checkbox-field">
+                  <label class="checkbox-label">
+                    <input type="checkbox" class="override-noindex" />
+                    <span>Noindex (hide from search engines)</span>
+                  </label>
+                </div>
+                <div class="field">
+                  <label>Custom Canonical URL</label>
+                  <input type="text" class="input input-sm override-canonical" placeholder="https://..." />
+                </div>
+              </div>
+              <div class="field">
+                <label>Target Keywords (comma-separated)</label>
+                <input type="text" class="input input-sm override-keywords" placeholder="keyword1, keyword2" />
+              </div>
+              <div class="override-actions">
+                <button type="button" class="btn btn-sm btn-accent save-override">Save Override</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-toast" id="toast" role="alert" aria-live="polite" hidden></div>
+</AdminLayout>
+
+<script>
+  (function() {
+    const toast = document.getElementById("toast");
+    const issuesCard = document.getElementById("issues-card");
+    const issuesList = document.getElementById("issues-list");
+    const scoreValue = document.getElementById("score-value");
+    const scoreLabel = document.getElementById("score-label");
+    const scoreRingFill = document.getElementById("score-ring-fill");
+    const criticalCount = document.getElementById("issue-critical");
+    const warningCount = document.getElementById("issue-warning");
+    const infoCount = document.getElementById("issue-info");
+
+    // ---- Tabs ----
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab)?.classList.add("active");
+      });
+    });
+
+    // ---- Run audit ----
+    document.getElementById("run-audit-btn")?.addEventListener("click", runAudit);
+    async function runAudit() {
+      const btn = document.getElementById("run-audit-btn");
+      btn.disabled = true;
+      btn.textContent = "Scanning…";
+
+      try {
+        const res = await fetch("/api/admin/seo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "run-audit" }),
+        });
+        const data = await res.json();
+
+        if (data.success && data.result) {
+          renderAuditResult(data.result);
+        } else {
+          showToast(data.error || "Audit failed.", "error");
+        }
+      } catch {
+        showToast("Network error.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "⟳ Run Full Audit";
+      }
+    }
+
+    function renderAuditResult(result) {
+      // Score
+      const score = result.score;
+      scoreValue.textContent = score;
+      const gradeLabel = score >= 90 ? "Excellent" : score >= 70 ? "Good" : score >= 50 ? "Needs Work" : "Poor";
+      scoreLabel.textContent = gradeLabel;
+
+      const circumference = 2 * Math.PI * 54;
+      const offset = circumference - (score / 100) * circumference;
+      scoreRingFill.style.strokeDasharray = `${circumference} ${circumference}`;
+      scoreRingFill.style.strokeDashoffset = offset;
+
+      const color = score >= 90 ? "#10b981" : score >= 70 ? "#d97706" : score >= 50 ? "#f97316" : "#ef4444";
+      scoreRingFill.style.stroke = color;
+      scoreValue.style.color = color;
+
+      // Counts
+      const criticals = result.issues.filter(i => i.severity === "critical");
+      const warnings = result.issues.filter(i => i.severity === "warning");
+      const infos = result.issues.filter(i => i.severity === "info");
+
+      criticalCount.textContent = criticals.length;
+      warningCount.textContent = warnings.length;
+      infoCount.textContent = infos.length;
+
+      // Quick checks
+      const checks = document.querySelectorAll(".check-item");
+      checks.forEach(c => {
+        const type = c.dataset.check;
+        const typeIssues = result.issues.filter(i => i.type === type);
+        if (typeIssues.length === 0) {
+          c.className = "check-item pass";
+          c.querySelector(".check-icon").textContent = "✓";
+        } else if (typeIssues.some(i => i.severity === "critical")) {
+          c.className = "check-item fail";
+          c.querySelector(".check-icon").textContent = "✗";
+        } else {
+          c.className = "check-item warn";
+          c.querySelector(".check-icon").textContent = "!";
+        }
+      });
+
+      // Issues list
+      if (result.issues.length > 0) {
+        issuesCard.style.display = "block";
+        const sorted = [...criticals, ...warnings, ...infos];
+        issuesList.innerHTML = sorted.map(issue => `
+          <div class="issue-row issue-${issue.severity}">
+            <div class="issue-severity">${issue.severity === "critical" ? "🔴" : issue.severity === "warning" ? "🟠" : "ℹ️"}</div>
+            <div class="issue-body">
+              <div class="issue-page">${escapeHtml(issue.page)}</div>
+              <div class="issue-message">${escapeHtml(issue.message)}</div>
+              ${issue.recommendation ? `<div class="issue-recommendation">→ ${escapeHtml(issue.recommendation)}</div>` : ""}
+            </div>
+          </div>
+        `).join("");
+      } else {
+        issuesCard.style.display = "none";
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ---- Load settings ----
+    async function loadSettings() {
+      try {
+        const res = await fetch("/api/admin/seo", { method: "GET" });
+        const data = await res.json();
+        if (data.success) {
+          const s = data.settings;
+          document.getElementById("site-title").value = s.siteTitle || "";
+          document.getElementById("site-description").value = s.siteDescription || "";
+          document.getElementById("og-image").value = s.defaultOgImage || "";
+          document.getElementById("track-keywords").value = (s.trackKeywords || []).join("\n");
+          document.querySelector("[name='enableJsonLd']").checked = s.enableJsonLd !== false;
+          document.getElementById("robots-editor").value = data.robots || "";
+
+          // Load page overrides
+          if (s.pageOverrides) {
+            document.querySelectorAll(".override-item").forEach(item => {
+              const url = item.dataset.url;
+              const ov = s.pageOverrides[url];
+              if (ov) {
+                item.querySelector(".override-title").value = ov.title || "";
+                item.querySelector(".override-description").value = ov.description || "";
+                item.querySelector(".override-og-image").value = ov.ogImage || "";
+                item.querySelector(".override-noindex").checked = ov.noindex || false;
+                item.querySelector(".override-canonical").value = ov.canonical || "";
+                item.querySelector(".override-keywords").value = (ov.targetKeywords || []).join(", ");
+              }
+            });
+          }
+        }
+      } catch {}
+    }
+    loadSettings();
+
+    // ---- Save settings ----
+    document.getElementById("settings-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("save-settings-btn");
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+
+      const trackKeywords = document.getElementById("track-keywords").value
+        .split("\n").map(s => s.trim()).filter(Boolean);
+
+      const settings = {
+        siteTitle: document.getElementById("site-title").value,
+        siteDescription: document.getElementById("site-description").value,
+        defaultOgImage: document.getElementById("og-image").value,
+        enableJsonLd: document.querySelector("[name='enableJsonLd']").checked,
+        trackKeywords,
+        pageOverrides: {},
+      };
+
+      try {
+        const res = await fetch("/api/admin/seo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "save-settings", settings }),
+        });
+        const data = await res.json();
+        showToast(data.success ? "Settings saved!" : data.error, data.success ? "success" : "error");
+      } catch {
+        showToast("Network error.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Save Settings";
+      }
+    });
+
+    // ---- Save robots.txt ----
+    document.getElementById("robots-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("save-robots-btn");
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+
+      try {
+        const res = await fetch("/api/admin/seo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "save-robots",
+            robots: document.getElementById("robots-editor").value,
+          }),
+        });
+        const data = await res.json();
+        showToast(data.success ? "robots.txt saved!" : data.error, data.success ? "success" : "error");
+      } catch {
+        showToast("Network error.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Save robots.txt";
+      }
+    });
+
+    // ---- Toggle page override ----
+    document.querySelectorAll(".toggle-override").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const body = btn.closest(".override-item").querySelector(".override-body");
+        const isVisible = body.style.display !== "none";
+        body.style.display = isVisible ? "none" : "block";
+        btn.textContent = isVisible ? "Edit" : "Close";
+      });
+    });
+
+    // ---- Save page override ----
+    document.querySelectorAll(".save-override").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const item = btn.closest(".override-item");
+        const url = item.dataset.url;
+        const override = {
+          title: item.querySelector(".override-title").value || undefined,
+          description: item.querySelector(".override-description").value || undefined,
+          ogImage: item.querySelector(".override-og-image").value || undefined,
+          noindex: item.querySelector(".override-noindex").checked || undefined,
+          canonical: item.querySelector(".override-canonical").value || undefined,
+          targetKeywords: item.querySelector(".override-keywords").value
+            .split(",").map(s => s.trim()).filter(Boolean) || undefined,
+        };
+
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        try {
+          const res = await fetch("/api/admin/seo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "save-page-override", url, override }),
+          });
+          const data = await res.json();
+          showToast(data.success ? "Override saved!" : data.error, data.success ? "success" : "error");
+        } catch {
+          showToast("Network error.", "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Save Override";
+        }
+      });
+    });
+
+    // ---- Auto-run audit on load ----
+    setTimeout(runAudit, 500);
+
+    // ---- Toast ----
+    function showToast(message, type = "info") {
+      if (!toast) return;
+      toast.textContent = message;
+      toast.className = "admin-toast admin-toast-" + type;
+      toast.hidden = false;
+      setTimeout(() => { toast.hidden = true; }, 4000);
+    }
+  })();
+</script>
+
+<style>
+  .seo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 700px) {
+    .seo-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Score ring */
+
+  .quick-checks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    padding: 0.375rem 0;
+  }
+
+  .check-icon { width: 1.25rem; text-align: center; font-weight: 600; }
+  .check-item.pending .check-icon { color: var(--color-text-muted, #5a5a5a); }
+  .check-item.pass .check-icon { color: var(--color-success, #10b981); }
+  .check-item.warn .check-icon { color: var(--color-accent, #d97706); }
+  .check-item.fail .check-icon { color: var(--color-error, #ef4444); }
+  .check-item.pass .check-label { color: var(--color-success, #10b981); }
+  .check-item.warn .check-label { color: var(--color-accent, #d97706); }
+  .check-item.fail .check-label { color: var(--color-error, #ef4444); }
+
+  /* Issues */
+  .issue-row {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border, #e5e5e5);
+  }
+
+  .issue-row:last-child { border-bottom: none; }
+
+  .issue-severity { font-size: 1rem; flex-shrink: 0; padding-top: 0.125rem; }
+
+  .issue-body { flex: 1; }
+  .issue-page {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary, #1a3a5c);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.125rem;
+  }
+
+  .issue-message { font-size: 0.875rem; color: var(--color-text, #1a1a1a); }
+  .issue-recommendation { font-size: 0.8125rem; color: var(--color-text-muted, #5a5a5a); margin-top: 0.125rem; }
+
+  /* Robots header */
+  .robots-header { margin-bottom: 1rem; }
+
+  /* Page overrides */
+  .overrides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .override-item {
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .override-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-bg-alt, #f7f7f5);
+  }
+
+  .override-url {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-primary, #1a3a5c);
+    flex: 1;
+  }
+
+  .override-page-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #5a5a5a);
+    padding: 0.125rem 0.5rem;
+    background: var(--color-bg, #ffffff);
+    border-radius: 9999px;
+  }
+
+  .override-body {
+    padding: 1rem;
+  }
+
+  .field-row-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .field-row-inline { grid-template-columns: 1fr; }
+  }
+
+  .override-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>

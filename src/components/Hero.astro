@@ -1,0 +1,98 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  primaryCta?: { label: string; href: string };
+  secondaryCta?: { label: string; href: string };
+  image?: string;
+  imageAlt?: string;
+}
+const { eyebrow, title, description, primaryCta, secondaryCta, image, imageAlt = "" } = Astro.props;
+---
+
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-content">
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1>{title}</h1>
+      {description && <p class="hero-description">{description}</p>}
+      {(primaryCta || secondaryCta) && (
+        <div class="hero-ctas">
+          {primaryCta && <a href={primaryCta.href} class="btn btn-accent">{primaryCta.label}</a>}
+          {secondaryCta && <a href={secondaryCta.href} class="btn btn-outline">{secondaryCta.label}</a>}
+        </div>
+      )}
+    </div>
+    {image && (
+      <div class="hero-media">
+        <img src={image} alt={imageAlt} loading="eager" />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(var(--space-16), 12vw, var(--space-32));
+    background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 100%);
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+  .hero-content :global(p.eyebrow) {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-4);
+  }
+  .hero-content h1 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-6);
+    max-width: 18ch;
+  }
+  .hero-description {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-8);
+    max-width: 50ch;
+  }
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+  .hero-media img {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    width: 100%;
+    transition: all var(--duration-base) var(--ease-out);
+  }
+  .hero-media img[src*="logo"] {
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.35)) drop-shadow(0 0 50px rgba(139, 92, 246, 0.2)) !important;
+    animation: float-hero-logo 6s ease-in-out infinite !important;
+  }
+
+  @keyframes float-hero-logo {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(1deg); }
+  }
+  @media (min-width: 880px) {
+    .hero-inner {
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,150 @@
+---
+interface LogoItem {
+  src: string;
+  alt: string;
+  href?: string;
+  width?: number;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  logos: LogoItem[];
+  variant?: "grid" | "carousel";
+}
+
+const { eyebrow, heading, logos, variant = "grid" } = Astro.props;
+const half = Math.ceil(logos.length / 2);
+const logosA = logos.slice(0, half);
+const logosB = logos.slice(half);
+---
+
+<section class="section logo-cloud">
+  <div class="container">
+    {(eyebrow || heading) && (
+      <header class="section-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        {heading && <h2>{heading}</h2>}
+      </header>
+    )}
+
+    {variant === "grid" ? (
+      <div class="logo-grid">
+        {logos.map((logo) => (
+          <div class="logo-item">
+            {logo.href ? (
+              <a href={logo.href} target="_blank" rel="noopener noreferrer" aria-label={logo.alt}>
+                <img src={logo.src} alt={logo.alt} loading="lazy" width={logo.width} />
+              </a>
+            ) : (
+              <img src={logo.src} alt={logo.alt} loading="lazy" width={logo.width} />
+            )}
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div class="logo-marquee" aria-label="Trusted by">
+        <div class="marquee-track">
+          <div class="marquee-group">
+            {logos.map((logo) => (
+              <div class="logo-item">
+                {logo.href ? (
+                  <a href={logo.href} target="_blank" rel="noopener noreferrer" aria-label={logo.alt}>
+                    <img src={logo.src} alt={logo.alt} loading="lazy" width={logo.width} />
+                  </a>
+                ) : (
+                  <img src={logo.src} alt={logo.alt} loading="lazy" width={logo.width} />
+                )}
+              </div>
+            ))}
+          </div>
+          <div class="marquee-group" aria-hidden="true">
+            {logos.map((logo) => (
+              <div class="logo-item">
+                <img src={logo.src} alt="" loading="lazy" width={logo.width} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+  .section-header .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  .section-header h2 {
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+    font-weight: 500;
+    font-family: var(--font-body);
+  }
+
+  .logo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-8);
+    align-items: center;
+    justify-items: center;
+  }
+  .logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+  }
+  .logo-item img {
+    max-width: 140px;
+    max-height: 60px;
+    opacity: 0.5;
+    transition: opacity var(--duration-base) var(--ease-out);
+    object-fit: contain;
+  }
+  .logo-item:hover img { opacity: 0.8; }
+
+  /* Carousel / marquee variant */
+  .logo-marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 5%,
+      black 95%,
+      transparent 100%
+    );
+  }
+  .marquee-track {
+    display: flex;
+    gap: var(--space-12);
+    animation: marquee 30s linear infinite;
+  }
+  .marquee-group {
+    display: flex;
+    gap: var(--space-12);
+    flex-shrink: 0;
+  }
+  .marquee-group .logo-item img {
+    max-width: 120px;
+    max-height: 50px;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+  }
+</style>

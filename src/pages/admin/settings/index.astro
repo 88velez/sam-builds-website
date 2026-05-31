@@ -1,0 +1,510 @@
+---
+export const prerender = false;
+
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="Site Settings" activePage="settings">
+  <!-- Tabs -->
+  <div class="tabs" id="settings-tabs">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="business">Business Info</button>
+      <button class="tab-btn" data-tab="pwa">PWA & Branding</button>
+      <button class="tab-btn" data-tab="code">Custom Code</button>
+      <button class="tab-btn" data-tab="widgets">Widgets</button>
+    </div>
+
+    <!-- Tab: Business Info -->
+    <div class="tab-panel active" id="tab-business">
+      <form id="business-form">
+        <div class="field-row">
+          <div class="field">
+            <label for="biz-name">Business Name</label>
+            <input id="biz-name" type="text" class="input" placeholder="Your Business Name" />
+          </div>
+          <div class="field">
+            <label for="biz-tagline">Tagline</label>
+            <input id="biz-tagline" type="text" class="input" placeholder="Your tagline or motto" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="biz-phone">Phone</label>
+            <input id="biz-phone" type="tel" class="input" placeholder="(555) 123-4567" />
+          </div>
+          <div class="field">
+            <label for="biz-email">Email</label>
+            <input id="biz-email" type="email" class="input" placeholder="hello@yourbusiness.com" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="biz-address">Address</label>
+          <input id="biz-address" type="text" class="input" placeholder="123 Main St, City, State 12345" />
+        </div>
+        <div class="field">
+          <label for="biz-hours">Business Hours</label>
+          <input id="biz-hours" type="text" class="input" placeholder="Mon–Fri: 9am–5pm, Sat: 10am–2pm" />
+        </div>
+        <div class="field checkbox-field">
+          <label class="checkbox-label">
+            <input type="checkbox" name="enableScorecard" value="true" />
+            <span>Enable performance scorecard (display site metrics in admin)</span>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-accent">Save Business Info</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab: PWA & Branding -->
+    <div class="tab-panel" id="tab-pwa">
+      <form id="pwa-form">
+        <div class="field checkbox-field">
+          <label class="checkbox-label">
+            <input type="checkbox" name="enablePWA" value="true" />
+            <span>Enable Progressive Web App (PWA)</span>
+          </label>
+        </div>
+
+        <h4 class="subtitle">Manifest Settings</h4>
+        <div class="field-row">
+          <div class="field">
+            <label for="pwa-name">App Name</label>
+            <input id="pwa-name" type="text" class="input" placeholder="Your Business Name" />
+          </div>
+          <div class="field">
+            <label for="pwa-short-name">Short Name</label>
+            <input id="pwa-short-name" type="text" class="input" placeholder="Business" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="pwa-desc">Description</label>
+          <textarea id="pwa-desc" class="input textarea" rows="2" placeholder="A brief description of your PWA"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="pwa-start-url">Start URL</label>
+            <input id="pwa-start-url" type="text" class="input" value="/" />
+          </div>
+          <div class="field">
+            <label for="pwa-display">Display Mode</label>
+            <select id="pwa-display" class="input">
+              <option value="standalone">Standalone</option>
+              <option value="fullscreen">Fullscreen</option>
+              <option value="minimal-ui">Minimal UI</option>
+              <option value="browser">Browser</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="pwa-theme">Theme Color</label>
+            <div class="color-wrap">
+              <input id="pwa-theme" type="color" class="color-input" value="#1a3a5c" />
+              <input type="text" class="input input-sm color-text" data-for="pwa-theme" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="pwa-bg">Background Color</label>
+            <div class="color-wrap">
+              <input id="pwa-bg" type="color" class="color-input" value="#ffffff" />
+              <input type="text" class="input input-sm color-text" data-for="pwa-bg" />
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="pwa-icon-192">192px Icon Path</label>
+            <input id="pwa-icon-192" type="text" class="input" value="/icons/icon-192.png" />
+          </div>
+          <div class="field">
+            <label for="pwa-icon-512">512px Icon Path</label>
+            <input id="pwa-icon-512" type="text" class="input" value="/icons/icon-512.png" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-accent">Save PWA Settings</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab: Custom Code -->
+    <div class="tab-panel" id="tab-code">
+      <form id="code-form">
+        <div class="field">
+          <label for="custom-css">Custom CSS</label>
+          <textarea id="custom-css" class="input textarea textarea-mono" rows="8" placeholder="/* Your custom CSS here */"></textarea>
+          <p class="field-hint">Injected globally on every page.</p>
+        </div>
+        <div class="field">
+          <label for="custom-head">Custom &lt;head&gt; HTML</label>
+          <textarea id="custom-head" class="input textarea textarea-mono" rows="6" placeholder="<!-- Analytics, meta tags, fonts, etc. -->"></textarea>
+          <p class="field-hint">Injected before &lt;/head&gt;. Use for analytics scripts, extra meta tags, etc.</p>
+        </div>
+        <div class="field">
+          <label for="custom-footer">Custom Footer HTML</label>
+          <textarea id="custom-footer" class="input textarea textarea-mono" rows="6" placeholder="<!-- Footer scripts, chat widgets, etc. -->"></textarea>
+          <p class="field-hint">Injected before &lt;/body&gt;. Use for chat widgets, remarketing pixels, etc.</p>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-accent">Save Custom Code</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Tab: Widgets -->
+    <div class="tab-panel" id="tab-widgets">
+      <div class="widgets-header">
+        <h4 class="subtitle">Active Widgets</h4>
+        <button class="btn btn-primary" id="show-add-widget">+ Add Widget</button>
+      </div>
+
+      <form id="add-widget-form" class="new-widget-form" style="display:none">
+        <div class="field-row">
+          <div class="field">
+            <label for="widget-type">Type <span class="required">*</span></label>
+            <select id="widget-type" class="input" required>
+              <option value="">Select type…</option>
+              <option value="chat">Live Chat</option>
+              <option value="booking">Booking Widget</option>
+              <option value="reviews">Reviews Widget</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="widget-title">Title <span class="required">*</span></label>
+            <input id="widget-title" type="text" class="input" required placeholder="e.g. Live Chat Support" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="widget-position">Position</label>
+          <select id="widget-position" class="input">
+            <option value="bottom-right">Bottom Right</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="inline">Inline (in page)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="widget-code">Widget Code / Script</label>
+          <textarea id="widget-code" class="input textarea textarea-mono" rows="6" placeholder="<script>...</script> or custom HTML"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-accent">Add Widget</button>
+          <button type="button" class="btn btn-outline" id="cancel-add-widget">Cancel</button>
+        </div>
+      </form>
+
+      <div id="widgets-list"></div>
+    </div>
+  </div>
+
+  <div class="admin-toast" id="toast" role="alert" aria-live="polite" hidden></div>
+</AdminLayout>
+
+<script>
+  (function() {
+    const toast = document.getElementById("toast");
+
+    // ---- Tabs ----
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab)?.classList.add("active");
+      });
+    });
+
+    // ---- Color picker sync ----
+    document.querySelectorAll(".color-input").forEach(input => {
+      input.addEventListener("input", () => {
+        const textInput = document.querySelector(`.color-text[data-for="${input.id}"]`);
+        if (textInput) textInput.value = input.value;
+      });
+      const textInput = document.querySelector(`.color-text[data-for="${input.id}"]`);
+      if (textInput) textInput.value = input.value;
+    });
+
+    document.querySelectorAll(".color-text").forEach(input => {
+      input.addEventListener("input", () => {
+        const colorInput = document.getElementById(input.dataset.for);
+        if (colorInput && /^#[0-9a-f]{6}$/i.test(input.value)) colorInput.value = input.value;
+      });
+    });
+
+    // ---- Load data ----
+    async function loadData() {
+      try {
+        const res = await fetch("/api/admin/settings", { method: "GET" });
+        const data = await res.json();
+        if (!data.success) return;
+
+        const s = data.settings;
+        document.getElementById("biz-name").value = s.businessName || "";
+        document.getElementById("biz-tagline").value = s.tagline || "";
+        document.getElementById("biz-phone").value = s.phone || "";
+        document.getElementById("biz-email").value = s.email || "";
+        document.getElementById("biz-address").value = s.address || "";
+        document.getElementById("biz-hours").value = s.businessHours || "";
+        document.querySelector("[name='enableScorecard']").checked = s.enablePerformanceScorecard || false;
+
+        document.querySelector("[name='enablePWA']").checked = s.enablePWA || false;
+        document.getElementById("pwa-name").value = s.pwaManifest?.name || "";
+        document.getElementById("pwa-short-name").value = s.pwaManifest?.shortName || "";
+        document.getElementById("pwa-desc").value = s.pwaManifest?.description || "";
+        document.getElementById("pwa-start-url").value = s.pwaManifest?.startUrl || "/";
+        document.getElementById("pwa-display").value = s.pwaManifest?.display || "standalone";
+        document.getElementById("pwa-theme").value = s.pwaManifest?.themeColor || "#1a3a5c";
+        document.querySelector(".color-text[data-for='pwa-theme']").value = s.pwaManifest?.themeColor || "#1a3a5c";
+        document.getElementById("pwa-bg").value = s.pwaManifest?.backgroundColor || "#ffffff";
+        document.querySelector(".color-text[data-for='pwa-bg']").value = s.pwaManifest?.backgroundColor || "#ffffff";
+        document.getElementById("pwa-icon-192").value = s.pwaManifest?.icon192 || "/icons/icon-192.png";
+        document.getElementById("pwa-icon-512").value = s.pwaManifest?.icon512 || "/icons/icon-512.png";
+
+        document.getElementById("custom-css").value = s.customCss || "";
+        document.getElementById("custom-head").value = s.customHeadHtml || "";
+        document.getElementById("custom-footer").value = s.customFooterHtml || "";
+
+        renderWidgets(data.widgets);
+      } catch {}
+    }
+
+    function renderWidgets(widgets) {
+      const container = document.getElementById("widgets-list");
+      if (!widgets || widgets.length === 0) {
+        container.innerHTML = '<p class="empty-note">No widgets installed</p>';
+        return;
+      }
+
+      container.innerHTML = widgets.map(w => `
+        <div class="widget-item">
+          <div class="widget-info">
+            <strong>${escapeHtml(w.title)}</strong>
+            <span class="widget-type">${w.type}</span>
+            <span class="widget-pos">${w.position}</span>
+          </div>
+          <span class="widget-toggle">
+            <label class="toggle-label">
+              <input type="checkbox" class="widget-enabled" data-id="${w.id}" ${w.enabled ? "checked" : ""} />
+              <span class="toggle-switch"></span>
+            </label>
+          </span>
+          <button class="btn btn-sm btn-outline btn-danger delete-widget" data-id="${w.id}">Delete</button>
+        </div>
+      `).join("");
+
+      container.querySelectorAll(".widget-enabled").forEach(chk => {
+        chk.addEventListener("change", async () => {
+          const res = await fetch("/api/admin/settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "update-widget", id: chk.dataset.id, updates: { enabled: chk.checked } }),
+          });
+          const data = await res.json();
+          if (data.success) showToast("Widget toggled.", "info");
+        });
+      });
+
+      container.querySelectorAll(".delete-widget").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (!confirm("Delete this widget?")) return;
+          const res = await fetch("/api/admin/settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "delete-widget", id: btn.dataset.id }),
+          });
+          const data = await res.json();
+          if (data.success) { loadData(); showToast("Widget deleted.", "info"); }
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str || "";
+      return div.innerHTML;
+    }
+
+    // ---- Save Business Info ----
+    document.getElementById("business-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const current = await getCurrentSettings();
+      const settings = {
+        ...current,
+        businessName: document.getElementById("biz-name").value,
+        tagline: document.getElementById("biz-tagline").value,
+        phone: document.getElementById("biz-phone").value,
+        email: document.getElementById("biz-email").value,
+        address: document.getElementById("biz-address").value,
+        businessHours: document.getElementById("biz-hours").value,
+        enablePerformanceScorecard: document.querySelector("[name='enableScorecard']").checked,
+      };
+      await saveSettings(settings);
+    });
+
+    // ---- Save PWA ----
+    document.getElementById("pwa-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const current = await getCurrentSettings();
+      const settings = {
+        ...current,
+        enablePWA: document.querySelector("[name='enablePWA']").checked,
+        pwaManifest: {
+          name: document.getElementById("pwa-name").value,
+          shortName: document.getElementById("pwa-short-name").value,
+          description: document.getElementById("pwa-desc").value,
+          startUrl: document.getElementById("pwa-start-url").value,
+          themeColor: document.getElementById("pwa-theme").value,
+          backgroundColor: document.getElementById("pwa-bg").value,
+          display: document.getElementById("pwa-display").value,
+          icon192: document.getElementById("pwa-icon-192").value,
+          icon512: document.getElementById("pwa-icon-512").value,
+        },
+      };
+      await saveSettings(settings);
+    });
+
+    // ---- Save Custom Code ----
+    document.getElementById("code-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const current = await getCurrentSettings();
+      const settings = {
+        ...current,
+        customCss: document.getElementById("custom-css").value,
+        customHeadHtml: document.getElementById("custom-head").value,
+        customFooterHtml: document.getElementById("custom-footer").value,
+      };
+      await saveSettings(settings);
+    });
+
+    async function getCurrentSettings() {
+      const res = await fetch("/api/admin/settings", { method: "GET" });
+      const data = await res.json();
+      return data.success ? data.settings : {};
+    }
+
+    async function saveSettings(settings) {
+      const btn = document.activeElement;
+      if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save-settings", settings }),
+      });
+      const data = await res.json();
+      showToast(data.success ? "Settings saved!" : data.error, data.success ? "success" : "error");
+      if (btn) { btn.disabled = false; btn.textContent = "Save"; }
+    }
+
+    // ---- Widget management ----
+    document.getElementById("show-add-widget")?.addEventListener("click", () => {
+      document.getElementById("add-widget-form").style.display = "block";
+    });
+    document.getElementById("cancel-add-widget")?.addEventListener("click", () => {
+      document.getElementById("add-widget-form").style.display = "none";
+    });
+
+    document.getElementById("add-widget-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const widget = {
+        type: document.getElementById("widget-type").value,
+        title: document.getElementById("widget-title").value,
+        code: document.getElementById("widget-code").value,
+        position: document.getElementById("widget-position").value,
+        enabled: true,
+      };
+
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "add-widget", widget }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Widget added!", "success");
+        document.getElementById("add-widget-form").style.display = "none";
+        document.getElementById("add-widget-form").reset();
+        loadData();
+      } else {
+        showToast(data.error || "Failed to add widget.", "error");
+      }
+    });
+
+    // ---- Toast ----
+    function showToast(message, type = "info") {
+      if (!toast) return;
+      toast.textContent = message;
+      toast.className = "admin-toast admin-toast-" + type;
+      toast.hidden = false;
+      setTimeout(() => { toast.hidden = true; }, 4000);
+    }
+
+    loadData();
+  })();
+</script>
+
+<style>
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+
+  .color-wrap { display: flex; gap: 0.5rem; align-items: center; }
+  .color-input { width: 44px; height: 38px; padding: 0; border: 1px solid var(--color-border, #e5e5e5); border-radius: 8px; cursor: pointer; }
+  .color-text { flex: 1; }
+
+  .field-hint { font-size: 0.75rem; color: var(--color-text-muted, #5a5a5a); margin-top: 0.125rem; }
+
+  .subtitle { font-size: 0.875rem; font-weight: 600; color: var(--color-text, #1a1a1a); margin: 1rem 0 0.75rem; }
+
+  #tab-pwa .subtitle { margin-top: 1.5rem; }
+
+  /* Widgets */
+  .widgets-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+
+  .new-widget-form {
+    background: var(--color-bg-alt, #f7f7f5);
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .widget-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem;
+    background: var(--color-bg, #ffffff);
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+  }
+
+  .widget-info { flex: 1; }
+  .widget-info strong { display: block; font-size: 0.875rem; color: var(--color-text, #1a1a1a); }
+  .widget-type { font-size: 0.75rem; color: var(--color-text-muted, #5a5a5a); text-transform: capitalize; margin-right: 0.5rem; }
+  .widget-pos { font-size: 0.6875rem; color: var(--color-text-muted, #5a5a5a); }
+
+  .toggle-label { display: flex; align-items: center; cursor: pointer; }
+  .toggle-switch {
+    width: 40px; height: 22px;
+    background: var(--color-border, #e5e5e5);
+    border-radius: 9999px;
+    position: relative;
+    transition: background 150ms ease;
+  }
+  .toggle-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 9999px;
+    transition: transform 150ms ease;
+  }
+  .widget-enabled:checked + .toggle-switch { background: var(--color-primary, #1a3a5c); }
+  .widget-enabled:checked + .toggle-switch::after { transform: translateX(18px); }
+  .widget-enabled { display: none; }
+
+
+</style>

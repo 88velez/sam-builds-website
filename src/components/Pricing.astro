@@ -1,0 +1,267 @@
+---
+interface PricingTier {
+  name: string;
+  price: string;
+  period?: string;       // e.g. "/mo", "/year", "one-time"
+  description?: string;
+  features: string[];
+  cta: { label: string; href: string };
+  highlighted?: boolean;  // mark the "most popular" plan
+  savings?: string;       // e.g. "Save 20%"
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  tiers: PricingTier[];
+  billingToggle?: boolean;  // show monthly/yearly toggle
+  monthlyTiers?: PricingTier[];
+  yearlyTiers?: PricingTier[];
+}
+
+const { eyebrow, heading, description, tiers, billingToggle = false, monthlyTiers, yearlyTiers } = Astro.props;
+---
+
+<section class="section pricing">
+  <div class="container">
+    {(eyebrow || heading) && (
+      <header class="section-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        {heading && <h2>{heading}</h2>}
+        {description && <p class="section-desc">{description}</p>}
+      </header>
+    )}
+
+    {billingToggle && monthlyTiers && yearlyTiers && (
+      <div class="billing-toggle" role="radiogroup" aria-label="Billing period">
+        <button class="toggle-btn active" data-period="monthly" role="radio" aria-checked="true">Monthly</button>
+        <button class="toggle-btn" data-period="yearly" role="radio" aria-checked="false">Yearly</button>
+      </div>
+    )}
+
+    <div class="pricing-grid">
+      {tiers.map((tier) => (
+        <article class:list={["pricing-card", { highlighted: tier.highlighted }]}>
+          {tier.highlighted && <span class="badge">Most popular</span>}
+          <div class="pricing-header">
+            <h3 class="tier-name">{tier.name}</h3>
+            {tier.description && <p class="tier-desc">{tier.description}</p>}
+            <div class="price-block">
+              <span class="price">{tier.price}</span>
+              {tier.period && <span class="period">{tier.period}</span>}
+            </div>
+            {tier.savings && <span class="savings">{tier.savings}</span>}
+          </div>
+          <ul class="feature-list">
+            {tier.features.map((feature) => (
+              <li class="feature-item">
+                <span class="check" aria-hidden="true">&#10003;</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+          <a href={tier.cta.href} class:list={["btn", tier.highlighted ? "btn-accent" : "btn-outline", "pricing-cta"]}>
+            {tier.cta.label}
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+  }
+  .section-header .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  .section-header h2 { color: var(--color-primary); }
+  .section-desc {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    max-width: 60ch;
+    margin: var(--space-4) auto 0;
+  }
+
+  .billing-toggle {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-10);
+    background: var(--color-bg-alt);
+    padding: var(--space-1);
+    border-radius: var(--radius-full);
+    width: fit-content;
+    margin-inline: auto;
+  }
+  .toggle-btn {
+    padding: var(--space-2) var(--space-6);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  .toggle-btn.active {
+    background: var(--color-bg);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .pricing-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform var(--duration-base) var(--ease-out),
+                box-shadow var(--duration-base) var(--ease-out);
+  }
+  .pricing-card:hover { box-shadow: var(--shadow-md); }
+  .pricing-card.highlighted {
+    border-color: var(--color-accent);
+    border-width: 2px;
+    transform: scale(1.03);
+    box-shadow: var(--shadow-lg);
+  }
+  .pricing-card.highlighted:hover { transform: scale(1.03) translateY(-2px); }
+
+  .badge {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    background: var(--color-accent);
+    color: var(--color-text-inverse);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  .pricing-header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .tier-name {
+    color: var(--color-primary);
+    font-size: var(--text-xl);
+    margin-bottom: var(--space-2);
+  }
+  .tier-desc {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+  }
+  .price-block { margin-bottom: var(--space-2); }
+  .price {
+    font-family: var(--font-display);
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+  .period {
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+  }
+  .savings {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-8) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex: 1;
+  }
+  .feature-item {
+    display: flex;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+  .check {
+    color: var(--color-success);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .pricing-cta {
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+  }
+</style>
+
+<script>
+  // Billing toggle functionality
+  const toggleGroup = document.querySelector(".billing-toggle");
+  if (toggleGroup) {
+    const monthlyData = JSON.parse('<%- JSON.stringify(monthlyTiers) %>');
+    const yearlyData = JSON.parse('<%- JSON.stringify(yearlyTiers) %>');
+
+    function renderTiers(tiers) {
+      document.querySelectorAll(".pricing-card").forEach((card, i) => {
+        if (!tiers[i]) return;
+        const t = tiers[i];
+        card.querySelector(".price").textContent = t.price;
+        card.querySelector(".period").textContent = t.period || "";
+        if (t.savings) {
+          let savingsEl = card.querySelector(".savings");
+          if (!savingsEl) {
+            savingsEl = document.createElement("span");
+            savingsEl.className = "savings";
+            card.querySelector(".price-block").after(savingsEl);
+          }
+          savingsEl.textContent = t.savings;
+        }
+      });
+    }
+
+    toggleGroup.querySelectorAll(".toggle-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        toggleGroup.querySelectorAll(".toggle-btn").forEach((b) => {
+          b.classList.remove("active");
+          b.setAttribute("aria-checked", "false");
+        });
+        btn.classList.add("active");
+        btn.setAttribute("aria-checked", "true");
+        renderTiers(btn.dataset.period === "monthly" ? monthlyData : yearlyData);
+      });
+    });
+  }
+</script>

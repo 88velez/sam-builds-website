@@ -1,0 +1,91 @@
+---
+interface Testimonial {
+  quote: string;
+  author: string;
+  role?: string;
+  rating?: number; // 1-5
+}
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  testimonials: Testimonial[];
+}
+const { eyebrow = "Testimonials", heading = "What our customers say", testimonials } = Astro.props;
+---
+
+<section class="section section-alt testimonials">
+  <div class="container">
+    <header class="section-header">
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      {heading && <h2>{heading}</h2>}
+    </header>
+    <div class="testimonial-grid">
+      {testimonials.map((t) => (
+        <figure class="testimonial">
+          {t.rating && (
+            <div class="rating" aria-label={`${t.rating} out of 5 stars`}>
+              {"★".repeat(t.rating)}{"☆".repeat(5 - t.rating)}
+            </div>
+          )}
+          <blockquote>"{t.quote}"</blockquote>
+          <figcaption>
+            <strong>{t.author}</strong>
+            {t.role && <span>{t.role}</span>}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+  .section-header .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  .section-header h2 { color: var(--color-primary); }
+
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+  .testimonial {
+    padding: var(--space-8);
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin: 0;
+  }
+  .rating {
+    color: var(--color-accent);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+    letter-spacing: 0.1em;
+  }
+  blockquote {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    color: var(--color-text);
+    margin: 0 0 var(--space-6) 0;
+    font-style: italic;
+  }
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  figcaption strong { color: var(--color-primary); }
+  figcaption span {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+</style>

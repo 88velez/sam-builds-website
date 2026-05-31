@@ -1,0 +1,100 @@
+---
+interface Props {
+  message?: string;
+  acceptLabel?: string;
+  declineLabel?: string;
+}
+
+const {
+  message = "This site uses cookies to improve your experience. By continuing, you agree to our use of cookies.",
+  acceptLabel = "Accept",
+  declineLabel = "Decline",
+} = Astro.props;
+---
+
+<div class="cookie-consent" role="dialog" aria-label="Cookie consent" aria-hidden="true">
+  <div class="cookie-inner">
+    <p class="cookie-message">{message}</p>
+    <div class="cookie-actions">
+      <button class="cookie-accept btn btn-accent">{acceptLabel}</button>
+      <button class="cookie-decline btn btn-outline">{declineLabel}</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9998;
+    background: var(--color-bg-dark);
+    color: var(--color-text-inverse);
+    padding: var(--space-4) var(--space-6);
+    transform: translateY(100%);
+    transition: transform var(--duration-slow) var(--ease-out);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+  }
+  .cookie-consent.visible {
+    transform: translateY(0);
+  }
+  .cookie-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .cookie-message {
+    font-size: var(--text-sm);
+    color: rgba(255,255,255,0.85);
+    max-width: 60ch;
+    margin: 0;
+  }
+  .cookie-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-shrink: 0;
+  }
+  .cookie-consent .btn-outline {
+    border-color: rgba(255,255,255,0.3);
+    color: var(--color-text-inverse);
+  }
+  .cookie-consent .btn-outline:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--color-text-inverse);
+  }
+</style>
+
+<script>
+  (function() {
+    const KEY = "cookie-consent";
+    if (localStorage.getItem(KEY)) return;
+
+    const banner = document.querySelector(".cookie-consent");
+    if (!banner) return;
+
+    // Show after a short delay
+    setTimeout(() => banner.classList.add("visible"), 500);
+
+    const accept = banner.querySelector(".cookie-accept");
+    const decline = banner.querySelector(".cookie-decline");
+
+    function dismiss(choice) {
+      localStorage.setItem(KEY, choice);
+      // Notify analytics loaders (SEO.astro) and the page-view beacon.
+      if (choice === "accepted") {
+        window.__consentGranted = true;
+        document.dispatchEvent(new Event("cookieconsent:accepted"));
+      }
+      banner.classList.remove("visible");
+      setTimeout(() => banner.remove(), 500);
+    }
+
+    accept?.addEventListener("click", () => dismiss("accepted"));
+    decline?.addEventListener("click", () => dismiss("declined"));
+  })();
+</script>

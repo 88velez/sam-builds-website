@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Update with your deployed sitemap URL
+Sitemap: https://yourbusiness.com/sitemap-index.xml

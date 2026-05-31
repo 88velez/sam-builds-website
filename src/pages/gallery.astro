@@ -1,0 +1,90 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Gallery from "../components/Gallery.astro";
+
+const galleryItems = [
+  { 
+    src: "https://placehold.co/800x600/020617/00f2fe?text=Pocono+Timber+Builders", 
+    alt: "Custom contractor website for a luxury local cabin builder", 
+    title: "Pocono Timber Builders", 
+    description: "Sleek portfolio showcase and automated estimate generator for a custom cabin framer.", 
+    category: "Contractor" 
+  },
+  { 
+    src: "https://placehold.co/800x600/020617/8b5cf6?text=Stroudsburg+Steakhouse", 
+    alt: "Fine dining restaurant menu and reservations system", 
+    title: "Stroudsburg Steakhouse", 
+    description: "A fast, phone-optimized digital menu and table reservations system avoiding commission cuts.", 
+    category: "Restaurant" 
+  },
+  { 
+    src: "https://placehold.co/800x600/020617/0ea5e9?text=Scranton+Auto+Care", 
+    alt: "Auto body and collision center service page", 
+    title: "Scranton Auto Care", 
+    description: "Click-to-call service booking, emergency towing locator, and local Google Reviews slider.", 
+    category: "Service" 
+  },
+  { 
+    src: "https://placehold.co/800x600/020617/d946ef?text=Pocono+Rental+Co", 
+    alt: "Outdoor equipment rental booking portal", 
+    title: "Pocono Rental Co", 
+    description: "Full booking system with live inventory selection, digital waivers, and secure deposits.", 
+    category: "Retail" 
+  },
+  { 
+    src: "https://placehold.co/800x600/020617/10b981?text=Kent+Chiropractic", 
+    alt: "Chiropractor booking and booking system", 
+    title: "Kent Chiropractic", 
+    description: "Patient scheduling portal with intake downloadables and localized structural SEO mapping.", 
+    category: "Service" 
+  },
+  { 
+    src: "https://placehold.co/800x600/020617/00f2fe?text=Mountain+Peak+Cabinetry", 
+    alt: "Kitchen cabinet woodworker product portfolio", 
+    title: "Mountain Peak Cabinetry", 
+    description: "Rich filterable project galleries, wood type selection grids, and local lead-capture forms.", 
+    category: "Contractor" 
+  }
+];
+---
+
+<BaseLayout 
+  title="Our Portfolio" 
+  description="Explore modern, custom-coded web design mockups for NEPA contractors, restaurants, shops, and service providers."
+>
+  <div class="tech-grid">
+    <section class="section page-header text-center">
+      <div class="container-narrow">
+        <p class="eyebrow">Proven Digital Results</p>
+        <h1>Our Web Showcase</h1>
+        <p class="lead">
+          We don't build generic templates. Here are high-performance local web design builds engineered 
+          specifically for speed, search relevance, and leads conversion.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <Gallery
+    eyebrow="Craftsmanship"
+    heading="Selected Builds"
+    items={galleryItems}
+    columns={3}
+  />
+</BaseLayout>
+
+<style>
+  .text-center { text-align: center; }
+  .page-header {
+    padding-block: clamp(var(--space-12), 10vw, var(--space-16));
+  }
+  .page-header h1 {
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+  .lead {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+  }
+</style>

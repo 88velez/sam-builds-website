@@ -1,0 +1,134 @@
+---
+import SEO from "../components/SEO.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import BackToTop from "../components/BackToTop.astro";
+import CookieConsent from "../components/CookieConsent.astro";
+import ScrollReveal from "../components/ScrollReveal.astro";
+import AnnouncementBar from "../components/AnnouncementBar.astro";
+import OfferPopup from "../components/OfferPopup.astro";
+import { site } from "../data/site.config";
+import { getSiteSettings } from "../lib/settings";
+import { getMarketingData } from "../lib/marketing";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  article?: boolean;
+  publishedTime?: string;
+  modifiedTime?: string;
+  noindex?: boolean;
+  hideCookieConsent?: boolean;
+  hideBackToTop?: boolean;
+}
+
+const { hideCookieConsent = false, hideBackToTop = false, ...seoProps } = Astro.props;
+
+// Admin-managed site settings + marketing config (read on the server per request).
+// Falls back to safe defaults if the data files don't exist.
+const settings = await getSiteSettings();
+const marketing = await getMarketingData();
+
+// Language from site.locale (e.g. "es-MX" -> "es").
+const lang = (site.locale || "en-US").split("-")[0];
+// Color preset from site.theme. "professional" is the default (:root), so we
+// only set the attribute for the other presets.
+const preset = site.theme && site.theme !== "professional" ? site.theme : undefined;
+// Whether cookie consent is required before analytics may run.
+const consentRequired = site.cookieConsent?.enabled ?? true;
+
+const showAnnouncement = marketing.announcement?.enabled && !!marketing.announcement?.text;
+const showPopup = marketing.popup?.enabled && !!marketing.popup?.title;
+---
+
+<!DOCTYPE html>
+<html lang={lang} data-preset={preset}>
+  <head>
+    <!-- Pre-paint: set theme + consent flags before the page renders (no flash). -->
+    <script is:inline define:vars={{ consentRequired }}>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme-preference") || "system";
+          var c = document.documentElement.classList;
+          c.add(t === "dark" ? "theme-dark" : t === "light" ? "theme-light" : "theme-system");
+        } catch (e) {}
+        window.__consentRequired = consentRequired;
+        window.__consentGranted =
+          !consentRequired || (function () {
+            try { return localStorage.getItem("cookie-consent") === "accepted"; }
+            catch (e) { return false; }
+          })();
+      })();
+    </script>
+
+    <SEO {...seoProps} />
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Premium modern tech fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom HTML injected from the admin Settings panel -->
+    {settings.customHeadHtml && <Fragment set:html={settings.customHeadHtml} />}
+    <!-- Custom CSS from the admin Settings panel (overrides design tokens) -->
+    {settings.customCss && <style set:html={settings.customCss}></style>}
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    {showAnnouncement && <AnnouncementBar {...marketing.announcement} />}
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    {!hideBackToTop && <BackToTop />}
+    {!hideCookieConsent && consentRequired && (
+      <CookieConsent message={site.cookieConsent?.message} />
+    )}
+    {showPopup && <OfferPopup popup={marketing.popup} />}
+    <ScrollReveal />
+
+    <!-- Custom footer HTML injected from the admin Settings panel -->
+    {settings.customFooterHtml && <Fragment set:html={settings.customFooterHtml} />}
+
+    <!-- Page view tracking (first-party). Only fires once consent is granted. -->
+    <script is:inline>
+      (function () {
+        function track() {
+          try {
+            var data = {
+              path: window.location.pathname,
+              referrer: document.referrer || "",
+            };
+            var params = new URLSearchParams(window.location.search);
+            if (params.get("utm_source")) {
+              data.utmSource = params.get("utm_source");
+              data.utmMedium = params.get("utm_medium") || "";
+              data.utmCampaign = params.get("utm_campaign") || "";
+              data.utmTerm = params.get("utm_term") || undefined;
+              data.utmContent = params.get("utm_content") || undefined;
+            }
+            var payload = JSON.stringify(data);
+            if (navigator.sendBeacon) {
+              navigator.sendBeacon("/api/track/pageview", payload);
+            } else {
+              fetch("/api/track/pageview", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: payload,
+                keepalive: true,
+              });
+            }
+          } catch (_e) {}
+        }
+        if (window.__consentGranted) track();
+        else document.addEventListener("cookieconsent:accepted", track, { once: true });
+      })();
+    </script>
+  </body>
+</html>

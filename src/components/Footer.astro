@@ -1,0 +1,174 @@
+---
+import { site, nav } from "../data/site.config";
+const year = new Date().getFullYear();
+const dayLabels: Record<string, string> = {
+  monday: "Mon", tuesday: "Tue", wednesday: "Wed",
+  thursday: "Thu", friday: "Fri", saturday: "Sat", sunday: "Sun",
+};
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <p class="brand-name">{site.name}</p>
+      <p class="brand-tagline">{site.tagline}</p>
+      {site.address.city && (
+        <address class="brand-address">
+          {site.address.street}<br />
+          {site.address.city}, {site.address.state} {site.address.zip}
+        </address>
+      )}
+    </div>
+
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul class="contact-list">
+        <li><a href={`tel:${site.phone.replace(/\D/g, "")}`}>{site.phoneDisplay}</a></li>
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+      </ul>
+      {site.social && Object.values(site.social).some(Boolean) && (
+        <ul class="social-list" aria-label="Social media">
+          {site.social.facebook && <li><a href={site.social.facebook} aria-label="Facebook">FB</a></li>}
+          {site.social.instagram && <li><a href={site.social.instagram} aria-label="Instagram">IG</a></li>}
+          {site.social.twitter && <li><a href={site.social.twitter} aria-label="Twitter / X">X</a></li>}
+          {site.social.linkedin && <li><a href={site.social.linkedin} aria-label="LinkedIn">LI</a></li>}
+          {site.social.youtube && <li><a href={site.social.youtube} aria-label="YouTube">YT</a></li>}
+        </ul>
+      )}
+    </div>
+
+    <div class="footer-col">
+      <h4>Hours</h4>
+      <ul class="hours-list">
+        {Object.entries(site.hours).map(([day, hrs]) => (
+          <li><span>{dayLabels[day]}</span><span>{hrs}</span></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul class="nav-list">
+        {nav.primary.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>© {year} {site.name}. All rights reserved.</p>
+    <ul class="legal-nav">
+      {nav.legal.map((item) => (
+        <li><a href={item.href}>{item.label}</a></li>
+      ))}
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-bg-dark);
+    color: var(--color-text-inverse);
+    padding-block: var(--space-16) var(--space-8);
+    margin-top: var(--space-24);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--space-12);
+  }
+  @media (max-width: 760px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 480px) {
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+  }
+  .brand-tagline {
+    color: rgba(255,255,255,0.7);
+    margin-bottom: var(--space-4);
+  }
+  .brand-address {
+    font-style: normal;
+    color: rgba(255,255,255,0.7);
+    line-height: var(--leading-snug);
+  }
+
+  .footer-col h4 {
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-4);
+    color: rgba(255,255,255,0.5);
+    font-family: var(--font-body);
+  }
+  .footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .footer-col a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+  }
+  .footer-col a:hover { color: var(--color-accent); }
+
+  .hours-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+  }
+  .hours-list span:first-child {
+    color: rgba(255,255,255,0.5);
+    min-width: 40px;
+  }
+
+  .social-list {
+    flex-direction: row !important;
+    gap: var(--space-3) !important;
+    margin-top: var(--space-4);
+  }
+  .social-list a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  .footer-bottom {
+    padding-top: var(--space-6);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+    color: rgba(255,255,255,0.5);
+  }
+  .legal-nav {
+    display: flex;
+    gap: var(--space-4);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .legal-nav a { color: rgba(255,255,255,0.5); }
+  .legal-nav a:hover { color: var(--color-accent); }
+</style>

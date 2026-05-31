@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../data/site.config";
+---
+
+<BaseLayout title="Terms of Service" description={`Terms of service for ${site.name}.`}>
+  <section class="section">
+    <div class="container-narrow prose">
+      <h1>Terms of Service</h1>
+      <p><em>Last updated: [DATE]</em></p>
+
+      <p>Placeholder terms. Replace with real terms appropriate to your business.</p>
+
+      <h2>Use of site</h2>
+      <p>Describe acceptable use.</p>
+
+      <h2>Intellectual property</h2>
+      <p>State that site content is owned by {site.name}.</p>
+
+      <h2>Disclaimers</h2>
+      <p>Standard disclaimers about service / accuracy / liability.</p>
+
+      <h2>Contact</h2>
+      <p>Email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose h1 { color: var(--color-primary); margin-bottom: var(--space-6); }
+  .prose h2 { color: var(--color-primary); margin-top: var(--space-8); margin-bottom: var(--space-3); }
+  .prose p { margin-bottom: var(--space-4); }
+</style>

@@ -1,0 +1,119 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CTABanner from "../../components/CTABanner.astro";
+import { getCollection } from "astro:content";
+
+// On-demand: resolve the service by slug at request time (server output).
+const { slug } = Astro.params;
+const service = (await getCollection("services")).find((s) => s.slug === slug);
+if (!service) {
+  return Astro.redirect("/services", 302);
+}
+const { Content } = await service.render();
+---
+
+<BaseLayout
+  title={service.data.title}
+  description={service.data.description}
+>
+  <article class="section">
+    <div class="container-narrow">
+      <p class="breadcrumb"><a href="/services">← All services</a></p>
+      <header class="service-header">
+        {service.data.icon && <span class="service-icon" aria-hidden="true">{service.data.icon}</span>}
+        <h1>{service.data.title}</h1>
+        <p class="service-desc">{service.data.description}</p>
+        {service.data.price && (
+          <p class="service-price">
+            <span class="price-label">Pricing:</span> {service.data.price}{service.data.priceUnit && <span class="price-unit">/{service.data.priceUnit}</span>}
+          </p>
+        )}
+      </header>
+
+      <div class="service-body">
+        <Content />
+      </div>
+
+      <div class="service-cta">
+        <a href="/contact" class="btn btn-accent">Inquire about this service</a>
+      </div>
+    </div>
+  </article>
+  <CTABanner />
+</BaseLayout>
+
+<style>
+  .breadcrumb {
+    margin-bottom: var(--space-6);
+  }
+  .breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+  .breadcrumb a:hover { color: var(--color-accent); }
+
+  .service-header {
+    margin-bottom: var(--space-10);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .service-icon {
+    font-size: var(--text-5xl);
+    display: block;
+    margin-bottom: var(--space-4);
+  }
+  h1 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-4);
+  }
+  .service-desc {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-4);
+  }
+  .service-price {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  .price-label {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+  .price-unit { color: var(--color-text-muted); }
+
+  .service-body {
+    font-size: var(--text-base);
+    line-height: var(--leading-loose);
+  }
+  .service-body :global(h2) {
+    color: var(--color-primary);
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-4);
+  }
+  .service-body :global(h3) {
+    color: var(--color-primary);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+  .service-body :global(p),
+  .service-body :global(ul),
+  .service-body :global(ol) {
+    margin-bottom: var(--space-4);
+  }
+  .service-body :global(ul),
+  .service-body :global(ol) {
+    padding-left: var(--space-6);
+  }
+  .service-body :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .service-cta {
+    margin-top: var(--space-12);
+    text-align: center;
+  }
+</style>

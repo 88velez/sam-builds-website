@@ -1,0 +1,20 @@
+node_modules
+dist
+.DS_Store
+.env
+.env.local
+.vscode
+*.log
+.astro
+.netlify
+.vercel
+
+# Admin-generated data (may contain real contact emails / PII — never commit)
+src/data/contacts.json
+src/data/subscribers.json
+src/data/page-views.json
+src/data/utm-links.json
+src/data/marketing.json
+src/data/site-settings.json
+src/data/widgets.json
+src/data/seo-settings.json

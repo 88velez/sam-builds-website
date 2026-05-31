@@ -1,0 +1,98 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+---
+
+<BaseLayout title="Blog" description="Articles, news, and insights.">
+  <section class="section">
+    <div class="container-narrow">
+      <p class="eyebrow">Insights</p>
+      <h1>Blog</h1>
+      <p class="lead">Articles, tips, and updates from our team.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-narrow">
+      <ul class="post-list">
+        {posts.map((post) => (
+          <li class="post-card">
+            <a href={`/blog/${post.slug}/`}>
+              <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+              {post.data.tags.length > 0 && (
+                <ul class="tags">
+                  {post.data.tags.map((t) => <li>{t}</li>)}
+                </ul>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  h1 { color: var(--color-primary); margin-bottom: var(--space-4); }
+  .lead {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .post-card a {
+    display: block;
+    padding: var(--space-6) 0;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+  .post-card a:hover { opacity: 0.8; }
+  .post-card time {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .post-card h2 {
+    color: var(--color-primary);
+    margin-block: var(--space-2) var(--space-3);
+    font-size: var(--text-2xl);
+  }
+  .tags {
+    display: flex;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-4);
+  }
+  .tags li {
+    background: var(--color-bg-alt);
+    color: var(--color-text-muted);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>

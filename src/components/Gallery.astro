@@ -1,0 +1,319 @@
+---
+interface GalleryItem {
+  src: string;
+  alt: string;
+  title?: string;
+  description?: string;
+  category?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+  items: GalleryItem[];
+  columns?: 2 | 3 | 4;
+}
+
+const { eyebrow, heading, items, columns = 3 } = Astro.props;
+
+// Derive categories from items
+const categories = [...new Set(items.filter((i) => i.category).map((i) => i.category!))];
+---
+
+<section class="section gallery">
+  <div class="container">
+    {(eyebrow || heading) && (
+      <header class="section-header">
+        {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+        {heading && <h2>{heading}</h2>}
+      </header>
+    )}
+
+    {categories.length > 0 && (
+      <div class="gallery-filters" role="tablist" aria-label="Filter by category">
+        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+        {categories.map((cat) => (
+          <button class="filter-btn" data-filter={cat} role="tab" aria-selected="false">{cat}</button>
+        ))}
+      </div>
+    )}
+
+    <div class="gallery-grid" data-columns={columns}>
+      {items.map((item, i) => (
+        <figure class="gallery-item" data-category={item.category || ""}>
+          <button
+            class="gallery-trigger"
+            data-index={i}
+            aria-label={`View ${item.title || item.alt}`}
+          >
+            <img src={item.src} alt={item.alt} loading="lazy" />
+            {(item.title || item.description) && (
+              <figcaption class="gallery-overlay">
+                {item.title && <span class="gallery-title">{item.title}</span>}
+                {item.description && <span class="gallery-desc">{item.description}</span>}
+              </figcaption>
+            )}
+          </button>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" role="dialog" aria-label="Image viewer" aria-hidden="true">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <button class="lightbox-prev" aria-label="Previous">&#8249;</button>
+  <button class="lightbox-next" aria-label="Next">&#8250;</button>
+  <div class="lightbox-content">
+    <img class="lightbox-image" src="" alt="" />
+    <div class="lightbox-caption"></div>
+  </div>
+</div>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+  .section-header .eyebrow {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-3);
+  }
+  .section-header h2 { color: var(--color-primary); }
+
+  .gallery-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+  .filter-btn {
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  .filter-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .filter-btn.active {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--color-primary);
+  }
+
+  .gallery-grid {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .gallery-grid[data-columns="2"] { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .gallery-grid[data-columns="3"] { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .gallery-grid[data-columns="4"] { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+  .gallery-item {
+    margin: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+  }
+  .gallery-item.hidden { display: none; }
+
+  .gallery-trigger {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    position: relative;
+  }
+  .gallery-trigger img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+  .gallery-trigger:hover img { transform: scale(1.05); }
+
+  .gallery-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--space-4);
+    background: linear-gradient(transparent 50%, rgba(0,0,0,0.7));
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+    text-align: left;
+    color: var(--color-text-inverse);
+  }
+  .gallery-trigger:hover .gallery-overlay { opacity: 1; }
+  .gallery-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--text-lg);
+  }
+  .gallery-desc {
+    font-size: var(--text-sm);
+    opacity: 0.85;
+    margin-top: var(--space-1);
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+  .lightbox.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .lightbox-content {
+    max-width: 90vw;
+    max-height: 85vh;
+    text-align: center;
+  }
+  .lightbox-image {
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+  }
+  .lightbox-caption {
+    color: var(--color-text-inverse);
+    margin-top: var(--space-4);
+    font-size: var(--text-lg);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    background: none;
+    border: none;
+    color: var(--color-text-inverse);
+    font-size: var(--text-5xl);
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+  .lightbox-close:hover { opacity: 1; }
+  .lightbox-prev,
+  .lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: var(--color-text-inverse);
+    font-size: var(--text-5xl);
+    cursor: pointer;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    opacity: 0.7;
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+  .lightbox-prev { left: var(--space-4); }
+  .lightbox-next { right: var(--space-4); }
+  .lightbox-prev:hover,
+  .lightbox-next:hover { opacity: 1; background: rgba(255,255,255,0.2); }
+</style>
+
+<script>
+  const items = JSON.parse('<%- JSON.stringify(items.map(({ src, alt, title, description }) => ({ src, alt, title, description }))) %>');
+  let currentIndex = -1;
+
+  const lightbox = document.querySelector(".lightbox");
+  const lightboxImg = lightbox?.querySelector(".lightbox-image");
+  const lightboxCap = lightbox?.querySelector(".lightbox-caption");
+  const closeBtn = lightbox?.querySelector(".lightbox-close");
+  const prevBtn = lightbox?.querySelector(".lightbox-prev");
+  const nextBtn = lightbox?.querySelector(".lightbox-next");
+
+  function openLightbox(index) {
+    currentIndex = index;
+    const item = items[index];
+    if (!item) return;
+    lightboxImg.src = item.src;
+    lightboxImg.alt = item.alt;
+    const captionParts = [item.title, item.description].filter(Boolean);
+    lightboxCap.textContent = captionParts.join(" — ");
+    lightbox.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function navigate(dir) {
+    const visible = document.querySelectorAll('.gallery-item:not(.hidden) .gallery-trigger');
+    const visibleIndex = Array.from(visible).findIndex(el => parseInt(el.dataset.index) === currentIndex);
+    const newVisibleIndex = (visibleIndex + dir + visible.length) % visible.length;
+    const trigger = visible[newVisibleIndex];
+    if (trigger) openLightbox(parseInt(trigger.dataset.index));
+  }
+
+  document.querySelectorAll(".gallery-trigger").forEach((trigger) => {
+    trigger.addEventListener("click", () => openLightbox(parseInt(trigger.dataset.index)));
+  });
+
+  closeBtn?.addEventListener("click", closeLightbox);
+  prevBtn?.addEventListener("click", () => navigate(-1));
+  nextBtn?.addEventListener("click", () => navigate(1));
+  lightbox?.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener("keydown", (e) => {
+    if (!lightbox?.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") navigate(-1);
+    if (e.key === "ArrowRight") navigate(1);
+  });
+
+  // Filtering
+  document.querySelectorAll(".filter-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach((b) => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      const filter = btn.dataset.filter;
+      document.querySelectorAll(".gallery-item").forEach((item) => {
+        if (filter === "all" || item.dataset.category === filter) {
+          item.classList.remove("hidden");
+        } else {
+          item.classList.add("hidden");
+        }
+      });
+    });
+  });
+</script>

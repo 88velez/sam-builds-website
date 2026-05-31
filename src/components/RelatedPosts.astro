@@ -1,0 +1,102 @@
+---
+interface RelatedPost {
+  slug: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+  tags?: string[];
+}
+
+interface Props {
+  posts: RelatedPost[];
+  currentSlug: string;
+  currentTags?: string[];
+  heading?: string;
+  limit?: number;
+}
+
+const { posts, currentSlug, currentTags = [], heading = "Related articles", limit = 3 } = Astro.props;
+
+// Score posts by matching tags, exclude current
+const scored = posts
+  .filter((p) => p.slug !== currentSlug)
+  .map((p) => ({
+    ...p,
+    score: currentTags.length > 0
+      ? (p.tags || []).filter((t) => currentTags.includes(t)).length
+      : 0,
+  }))
+  .sort((a, b) => b.score - a.score)
+  .slice(0, limit);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+if (scored.length === 0) return; // Don't render anything if no related posts
+---
+
+<aside class="related-posts">
+  <div class="container-narrow">
+    <h2 class="related-heading">{heading}</h2>
+    <div class="related-grid">
+      {scored.map((post) => (
+        <a href={`/blog/${post.slug}/`} class="related-card">
+          <time datetime={post.pubDate.toISOString()}>{formatDate(post.pubDate)}</time>
+          <h3>{post.title}</h3>
+          <p>{post.description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</aside>
+
+<style>
+  .related-posts {
+    margin-top: var(--space-16);
+    padding-top: var(--space-12);
+    border-top: 1px solid var(--color-border);
+  }
+  .related-heading {
+    color: var(--color-primary);
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-6);
+    text-align: center;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+  }
+  .related-card {
+    display: block;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: all var(--duration-base) var(--ease-out);
+  }
+  .related-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+  }
+  .related-card time {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2);
+    display: block;
+  }
+  .related-card h3 {
+    color: var(--color-primary);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  .related-card:hover h3 { color: var(--color-accent); }
+  .related-card p {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+  }
+</style>

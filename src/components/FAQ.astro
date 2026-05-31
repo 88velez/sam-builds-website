@@ -1,0 +1,81 @@
+---
+interface FAQ {
+  question: string;
+  answer: string;
+}
+interface Props {
+  heading?: string;
+  faqs: FAQ[];
+}
+const { heading = "Frequently asked questions", faqs } = Astro.props;
+
+// Generate FAQ structured data (huge SEO boost)
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.question,
+    acceptedAnswer: { "@type": "Answer", text: f.answer },
+  })),
+};
+---
+
+<section class="section faq">
+  <div class="container-narrow">
+    <h2>{heading}</h2>
+    <div class="faq-list">
+      {faqs.map((f) => (
+        <details class="faq-item">
+          <summary>{f.question}</summary>
+          <div class="faq-answer"><p>{f.answer}</p></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+<style>
+  .faq h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-8);
+    text-align: center;
+  }
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color var(--duration-base) var(--ease-out);
+  }
+  .faq-item[open] { border-color: var(--color-primary); }
+  summary {
+    padding: var(--space-4) var(--space-6);
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    font-size: var(--text-2xl);
+    line-height: 1;
+    transition: transform var(--duration-base) var(--ease-out);
+    color: var(--color-accent);
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-answer {
+    padding: 0 var(--space-6) var(--space-6);
+    color: var(--color-text-muted);
+  }
+</style>

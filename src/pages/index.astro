@@ -1,0 +1,274 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ComingSoon from "../components/ComingSoon.astro";
+import Hero from "../components/Hero.astro";
+import FeatureGrid from "../components/FeatureGrid.astro";
+import Testimonials from "../components/Testimonials.astro";
+import FAQ from "../components/FAQ.astro";
+import CTABanner from "../components/CTABanner.astro";
+import Stats from "../components/Stats.astro";
+import Process from "../components/Process.astro";
+import Pricing from "../components/Pricing.astro";
+import { site } from "../data/site.config";
+
+// Check coming soon mode
+const comingSoon = site.comingSoon?.enabled ?? false;
+
+const features = [
+  { 
+    title: "Tailored Custom Design", 
+    description: "No generic templates or cookie-cutter builders. We custom-code every website around your specific brand voice and business goals.", 
+    icon: "🎨" 
+  },
+  { 
+    title: "Mobile-First & Lightning Fast", 
+    description: "Over 70% of local customers browse on phones. We optimize every millisecond of speed so you never lose a hot lead.", 
+    icon: "⚡" 
+  },
+  { 
+    title: "Built-In Local SEO", 
+    description: "Show up where it matters most. Includes structural schema markup, high-speed page metrics, and Google Business Profile setup from day one.", 
+    icon: "📈" 
+  },
+];
+
+const testimonials = [
+  { 
+    quote: "Sam built a free preview of our contracting site in 48 hours. Seeing the homepage before paying a single dollar made us instantly comfortable. The finished site is awesome and drives constant quotes.", 
+    author: "Mark Davis", 
+    role: "Owner, Pocono Carpentry & Trim", 
+    rating: 5 
+  },
+  { 
+    quote: "Our restaurant needed online ordering fast. Sam set up a beautiful system that works perfectly on phones. The custom design stands out, and his local NEPA support is unbeatable.", 
+    author: "Elena Rostova", 
+    role: "Manager, Stroudsburg Bistro", 
+    rating: 5 
+  },
+  { 
+    quote: "Absolutely exceeded our expectations. Fast, highly professional, and actually understands marketing. If you run a local business in the Scranton/Wilkes-Barre area, hire Sam.", 
+    author: "Dr. David Kent", 
+    role: "Founder, Kent Chiropractic", 
+    rating: 5 
+  },
+];
+
+const faqs = [
+  { 
+    question: "How does the free 48-hour homepage preview work?", 
+    answer: "It's simple: you tell me about your business, your target customers, and your style preferences. Within 48 hours, I'll build a custom interactive preview of your homepage for free. If you like what you see, we choose a plan and build the rest. If not, there's zero obligation." 
+  },
+  { 
+    question: "What is the difference between Pay-in-Full and Monthly Subscription?", 
+    answer: "Pay-in-Full lets you buy the site outright with a 50% deposit and 50% on completion. Monthly Subscription packages the build fee, hosting, domain, ongoing security, and monthly edits into a low, predictable rate to help your business cash flow." 
+  },
+  { 
+    question: "Do you offer ongoing edits and support after launch?", 
+    answer: "Yes! Pay-in-full clients can opt into a Monthly Care Plan for hosting, backups, and support. Subscription clients have care and edits fully built into their monthly rate. I'm local in Stroudsburg, so I'm always available to help." 
+  },
+];
+
+const stats = [
+  { value: "50+", label: "Websites Launched", icon: "🚀" },
+  { value: "48h", label: "Mockup Turnaround", icon: "⚡" },
+  { value: "100%", label: "Ownership of Code", icon: "🔑" },
+  { value: "2.5x", label: "Average Load Speedup", icon: "📈" },
+];
+
+const steps = [
+  { title: "Free Preview", description: "Request your custom homepage preview built in 48 hours for free. See before you spend.", icon: "🔍", duration: "Step 1" },
+  { title: "Choose Package", description: "Select Pay-in-Full or a Monthly subscription model based on your cash flow.", icon: "📋", duration: "Step 2" },
+  { title: "Full Build", description: "We develop all remaining pages, write high-converting copy, and optimize layouts.", icon: "💻", duration: "Step 3" },
+  { title: "SEO Alignment", description: "We build structured local schemas, speed optimize, and configure Google Business Profiles.", icon: "🚀", duration: "Step 4" },
+  { title: "Live Launch", description: "We launch your shiny new website! Optional care plans keep it safe, fast, and updated.", icon: "🎉", duration: "Step 5" },
+];
+
+const pricingTiers = [
+  {
+    name: "Starter Package",
+    price: "$1,495",
+    period: "one-time",
+    description: "Perfect for local businesses wanting a high-converting digital storefront.",
+    features: [
+      "3 to 5 custom-coded pages",
+      "100% Mobile-responsive design",
+      "Click-to-call & integrated map",
+      "Custom contact/leads form",
+      "Basic on-page local SEO setup",
+      "100% full ownership of site",
+    ],
+    cta: { label: "Request Free Preview", href: "/contact?package=starter" }
+  },
+  {
+    name: "Professional Package",
+    price: "$3,250",
+    period: "one-time",
+    description: "Best for growing service companies looking to dominate local search.",
+    highlighted: true,
+    features: [
+      "Up to 8 custom-coded pages",
+      "Professional copywriting support",
+      "Local schema & rich snippet data",
+      "Google Business Profile setup",
+      "Premium portfolio / project gallery",
+      "1 year of priority support & consultation",
+    ],
+    cta: { label: "Request Free Preview", href: "/contact?package=professional" }
+  },
+  {
+    name: "Premium Package",
+    price: "$5,500",
+    period: "from",
+    description: "Built for businesses requiring e-commerce, menus, or advanced integrations.",
+    features: [
+      "Unlimited pages & modular blocks",
+      "E-commerce or restaurant online ordering",
+      "Multi-location / multi-service area pages",
+      "Online booking / scheduling integration",
+      "Advanced database & API integrations",
+      "Comprehensive monthly growth strategy session",
+    ],
+    cta: { label: "Request Free Preview", href: "/contact?package=premium" }
+  }
+];
+---
+
+{comingSoon && (
+  <BaseLayout hideCookieConsent hideBackToTop>
+    <ComingSoon
+      heading={comingSoon.heading}
+      message={comingSoon.message}
+      launchDate={comingSoon.launchDate}
+    />
+  </BaseLayout>
+)}
+{!comingSoon && (
+  <BaseLayout>
+    <div class="tech-grid">
+      <Hero
+        eyebrow="Northeastern Pennsylvania's Premier Web Designer"
+        title="Websites that bring you customers—not just sit there."
+        description="I build custom, ultra-fast websites for contractors, restaurants, and shops in the Poconos and NEPA. I'll build a custom homepage preview in 48 hours for free — see it before you buy!"
+        primaryCta={{ label: "Claim Free 48h Mockup", href: "/contact" }}
+        secondaryCta={{ label: "View Pricing Packages", href: "/pricing" }}
+        image="/sam-builder-logo.png"
+        imageAlt="Sam Builds Websites Official Brand Logo"
+      />
+    </div>
+
+    <!-- Free Mockup Pitch Callout Banner -->
+    <section class="section section-alt free-preview-banner">
+      <div class="container preview-split-inner">
+        <div class="preview-text-col">
+          <div class="badge-glow mb-4">
+            <span class="glow-dot"></span> Risk-Free Mockup First Offer
+          </div>
+          <h2 class="section-title">See your site custom-designed before spending a dollar.</h2>
+          <p class="section-lead">
+            Most web designers ask you to pay thousands upfront and imagine the result. I do it backwards: 
+            <strong>I'll design a custom interactive homepage mockup for your business for free.</strong> If you love it, we build the full platform. If not, you owe me nothing.
+          </p>
+          <div class="action-row">
+            <a href="/contact" class="btn btn-accent btn-lg">Get Your Free Homepage Preview</a>
+          </div>
+        </div>
+        
+        <div class="preview-media-col glass-card">
+          <img src="/mockup_cyber_design.png" alt="Futuristic 3D web design preview rendering in progress" loading="lazy" />
+          <div class="media-accent-glow"></div>
+        </div>
+      </div>
+    </section>
+
+    <FeatureGrid eyebrow="Why Local Businesses Choose Sam" heading="Engineered for high conversions and local ranking" features={features} />
+    
+    <Stats stats={stats} columns={4} />
+    
+    <Process eyebrow="The Transparent Roadmap" heading="How we build together" description="A simple, five-step path from initial concept to a lead-generating live launch." steps={steps} variant="numbered" />
+    
+    <Pricing eyebrow="Simple & Honest Investment" heading="Website Packages" description="Choose a clear pay-in-full plan with absolute ownership, or spread costs monthly. See the Pricing page for monthly subscriptions." tiers={pricingTiers} />
+
+    <Testimonials testimonials={testimonials} />
+    
+    <FAQ faqs={faqs} />
+    
+    <CTABanner heading="Let's build a website that actually grows your business." description="No strings attached. Claim your custom 48-hour homepage mockup today." />
+  </BaseLayout>
+)}
+
+<style>
+  .free-preview-banner {
+    padding-block: var(--space-16);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(8px);
+  }
+  .preview-split-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+  @media (min-width: 880px) {
+    .preview-split-inner {
+      grid-template-columns: 1.25fr 1fr;
+    }
+  }
+  .preview-text-col {
+    text-align: left;
+  }
+  .preview-media-col {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 0 20px rgba(0, 242, 254, 0.03);
+    transition: all var(--duration-slow) var(--ease-out);
+    transform: perspective(1000px) rotateY(-10deg) rotateX(4deg) translateZ(0);
+  }
+  .preview-media-col:hover {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02) translateZ(10px);
+    border-color: rgba(0, 242, 254, 0.35);
+    box-shadow: 
+      0 30px 60px rgba(0, 242, 254, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 0 30px rgba(0, 242, 254, 0.06);
+  }
+  .preview-media-col img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    aspect-ratio: 1.1 / 1;
+  }
+  .media-accent-glow {
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(0, 242, 254, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .mb-4 {
+    margin-bottom: var(--space-4);
+  }
+  .section-title {
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+  }
+  .section-lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+    margin-bottom: var(--space-6);
+  }
+  .action-row {
+    margin-top: var(--space-6);
+  }
+</style>

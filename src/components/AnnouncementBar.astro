@@ -1,0 +1,98 @@
+---
+/**
+ * AnnouncementBar — site-wide banner driven by the admin Marketing panel
+ * (src/data/marketing.json → `announcement`). Rendered by BaseLayout when enabled.
+ */
+interface Props {
+  text?: string;
+  linkUrl?: string;
+  linkText?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  dismissible?: boolean;
+}
+
+const {
+  text = "",
+  linkUrl = "",
+  linkText = "",
+  backgroundColor = "#1a3a5c",
+  textColor = "#ffffff",
+  dismissible = true,
+} = Astro.props;
+
+// Changing the text invalidates a previous dismissal so visitors see new messages.
+const key = `announce:${text}`.slice(0, 60);
+---
+
+<div
+  class="announcement-bar"
+  data-key={key}
+  data-dismissible={dismissible ? "true" : "false"}
+  style={`--ann-bg:${backgroundColor};--ann-fg:${textColor}`}
+>
+  <p class="announcement-text">
+    {text}
+    {linkUrl && linkText && (
+      <a href={linkUrl} class="announcement-link">{linkText}</a>
+    )}
+  </p>
+  {dismissible && (
+    <button class="announcement-close" type="button" aria-label="Dismiss announcement">×</button>
+  )}
+</div>
+
+<style>
+  .announcement-bar {
+    background: var(--ann-bg);
+    color: var(--ann-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-6);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+  .announcement-text { margin: 0; max-width: none; }
+  .announcement-link {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+    margin-left: var(--space-2);
+  }
+  .announcement-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+  .announcement-close:hover { opacity: 1; }
+</style>
+
+<script>
+  (function () {
+    const bar = document.querySelector(".announcement-bar");
+    if (!bar) return;
+    const key = bar.getAttribute("data-key") || "announce";
+    const dismissible = bar.getAttribute("data-dismissible") === "true";
+
+    if (dismissible) {
+      try {
+        if (localStorage.getItem(key) === "dismissed") {
+          bar.remove();
+          return;
+        }
+      } catch (e) {}
+      const close = bar.querySelector(".announcement-close");
+      close?.addEventListener("click", () => {
+        try { localStorage.setItem(key, "dismissed"); } catch (e) {}
+        bar.remove();
+      });
+    }
+  })();
+</script>

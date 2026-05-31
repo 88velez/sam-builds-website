@@ -1,0 +1,239 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../data/site.config";
+---
+
+<BaseLayout 
+  title="Web Design Service Agreement Template" 
+  description="Review our transparent, plain-language web design service agreement template. We believe in total clarity and zero legal jargon."
+>
+  <div class="tech-grid">
+    <section class="section page-header text-center">
+      <div class="container-narrow">
+        <p class="eyebrow">Zero Shady Terms</p>
+        <h1>Our Service Agreement</h1>
+        <p class="lead">
+          We believe in doing business transparently. That is why we publish our plain-language 
+          contract template directly on our website. No hidden fine print.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <section class="section agreement-content">
+    <div class="container-narrow glass-card agreement-paper">
+      <div class="agreement-header text-center">
+        <h2>Web Design Service Agreement</h2>
+        <p class="template-note"><em>Template — Sourced for each client's specific packages</em></p>
+        <hr class="agreement-divider" />
+      </div>
+
+      <div class="agreement-body">
+        <div class="alert-info">
+          <strong>Note:</strong> This is our plain-language starting agreement template. Before launching, we fill in all bracketed fields with your specific business parameters, pages, and choice of pricing package.
+        </div>
+
+        <p class="intro-clause">
+          This Agreement is made on <strong>[date]</strong> between <strong>{site.name}</strong> ("Designer"), owned and operated by Samuel Velez, and <strong>[Client Business Name]</strong> ("Client").
+        </p>
+
+        <h3>1. Scope of Work</h3>
+        <p>The Designer will design and build a website for the Client as described below:</p>
+        <ul>
+          <li><strong>Package:</strong> [Starter / Professional / Premium]</li>
+          <li><strong>Pages:</strong> [list pages, e.g., Home, About, Services, Menu, Contact]</li>
+          <li><strong>Features:</strong> [e.g., contact form, online ordering, gallery, booking]</li>
+          <li><strong>Add-ons:</strong> [logo, copywriting, Google Business Profile setup, etc.]</li>
+        </ul>
+        <p>Work outside this scope will be quoted separately and added in writing before starting.</p>
+
+        <h3>2. Timeline</h3>
+        <p>
+          A free homepage preview will be delivered within 48 hours of the initial request. Once the deposit is received and all Client materials are provided, the full build will be completed in approximately [1–3 weeks]. Timelines depend on the Client providing content and feedback promptly.
+        </p>
+
+        <h3>3. Fees & Payment</h3>
+        <p>Choose the applicable option agreed upon:</p>
+        <div class="option-card">
+          <strong>Option A — Pay in Full (Ownership):</strong>
+          <p>Total fee of $[amount]. A 50% deposit of $[amount] is due before work begins; the remaining balance is due upon completion, before the site goes live.</p>
+        </div>
+        <div class="option-card">
+          <strong>Option B — Monthly Subscription Plan:</strong>
+          <p>A setup fee of $[amount] is due before work begins, followed by $[amount]/month for a minimum term of [12] months. Hosting, security care, and ongoing edits are fully included as described in the chosen plan.</p>
+        </div>
+        <p>
+          Optional care/hosting plan: $[amount]/month, billed [monthly], beginning at launch. Late payments over [15] days may result in the site being paused until the account is current.
+        </p>
+
+        <h3>4. Revisions</h3>
+        <p>
+          The package includes [2] rounds of revisions on the agreed design. Additional revision rounds are billed at $[rate] per hour or $[amount] per round.
+        </p>
+
+        <h3>5. Client Responsibilities</h3>
+        <ul>
+          <li>Provide text, images, logos, and other content needed for the site in a timely manner.</li>
+          <li>Confirm the Client has the right to use all materials supplied (photos, logos, text).</li>
+          <li>Review previews and provide consolidated feedback within [5] business days.</li>
+        </ul>
+
+        <h3>6. Ownership & Licensing</h3>
+        <p>
+          Upon receipt of full and final payment (pay-in-full option), ownership of the completed website design and content created for the Client transfers entirely to the Client. For the monthly plan, the Designer retains ownership of the site while the plan is active; the Client may purchase full ownership at any time for $[buy-out amount]. Third-party assets (fonts, stock images, plugins) remain subject to their own licenses. The Designer may display the completed work in a portfolio unless the Client requests otherwise in writing.
+        </p>
+
+        <h3>7. Hosting & Maintenance</h3>
+        <p>
+          Hosting and maintenance are provided only under an active care plan or monthly subscription. Without an active plan, the Client is responsible for their own hosting, updates, and security after the ownership transfer.
+        </p>
+
+        <h3>8. Cancellation & Refunds</h3>
+        <p>
+          Either party may cancel in writing. The deposit is non-refundable, as it reserves project time and covers initial work. If the Client cancels after work has begun, the Client is responsible for payment for work completed up to the cancellation date. Monthly plans may be cancelled after the minimum term with [30] days' written notice.
+        </p>
+
+        <h3>9. Limitation of Liability</h3>
+        <p>
+          The Designer's total liability under this Agreement will not exceed the total fees paid by the Client. The Designer is not liable for indirect or consequential damages, including lost profits, or for third-party service outages (hosting, domain, integrations).
+        </p>
+
+        <h3>10. Independent Contractor & Governing Law</h3>
+        <p>
+          The Designer is an independent contractor, not an employee of the Client. This Agreement is governed by the laws of the Commonwealth of Pennsylvania.
+        </p>
+
+        <div class="signatures-block">
+          <h4>Execution Signatures</h4>
+          <div class="sig-line">
+            <div>
+              <strong>Designer:</strong> Samuel Velez<br />
+              Signature: ______________________<br />
+              Date: __________________________
+            </div>
+            <div>
+              <strong>Client:</strong> ________________________<br />
+              Signature: ______________________<br />
+              Date: __________________________
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .text-center { text-align: center; }
+  .mb-12 { margin-bottom: var(--space-12); }
+  
+  .page-header {
+    padding-block: clamp(var(--space-12), 8vw, var(--space-16));
+  }
+  .page-header h1 {
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+  }
+  .lead {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+  }
+
+  /* Agreement Paper */
+  .agreement-content {
+    padding-block: var(--space-4) var(--space-16);
+  }
+  .agreement-paper {
+    padding: var(--space-10) var(--space-12);
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .agreement-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-block: var(--space-6);
+  }
+  
+  .alert-info {
+    background: rgba(14, 165, 233, 0.1);
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    color: var(--color-text);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    margin-bottom: var(--space-8);
+  }
+
+  .intro-clause {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: var(--leading-normal);
+    margin-bottom: var(--space-6);
+  }
+
+  .agreement-body h3 {
+    font-size: var(--text-lg);
+    color: var(--color-accent);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: var(--space-1);
+  }
+  .agreement-body p, .agreement-body ul {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-normal);
+    margin-bottom: var(--space-4);
+  }
+  .agreement-body ul {
+    padding-left: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .option-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+  }
+  .option-card strong {
+    display: block;
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+    font-size: var(--text-sm);
+  }
+  .option-card p {
+    margin-bottom: 0;
+  }
+
+  .signatures-block {
+    margin-top: var(--space-12);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: var(--space-8);
+  }
+  .signatures-block h4 {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    margin-bottom: var(--space-6);
+  }
+  .sig-line {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 2;
+  }
+
+  @media (max-width: 600px) {
+    .sig-line {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

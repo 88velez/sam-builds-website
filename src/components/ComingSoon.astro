@@ -1,0 +1,86 @@
+---
+import { site } from "../data/site.config";
+
+interface Props {
+  heading?: string;
+  message?: string;
+  launchDate?: string;
+}
+
+const {
+  heading = "Coming Soon",
+  message = "We're working on something great. Check back soon!",
+  launchDate = "",
+} = Astro.props;
+---
+
+<section class="coming-soon">
+  <div class="coming-soon-inner">
+    <h1>{heading}</h1>
+    <p class="coming-message">{message}</p>
+    {launchDate && (
+      <div class="launch-info">
+        <span class="launch-label">Launching</span>
+        <time datetime={launchDate}>
+          {new Date(launchDate).toLocaleDateString(site.locale || "en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </time>
+      </div>
+    )}
+    {site.email && (
+      <div class="coming-contact">
+        <p>Questions? <a href={`mailto:${site.email}`}>{site.email}</a></p>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .coming-soon {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-8);
+  }
+  .coming-soon-inner {
+    max-width: 560px;
+  }
+  h1 {
+    color: var(--color-primary);
+    margin-bottom: var(--space-4);
+  }
+  .coming-message {
+    font-size: var(--text-xl);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-6);
+  }
+  .launch-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+  .launch-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .launch-info time {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  .coming-contact {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>

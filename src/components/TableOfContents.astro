@@ -1,0 +1,89 @@
+---
+interface TocItem {
+  id: string;
+  text: string;
+  level: number;
+}
+
+interface Props {
+  items: TocItem[];
+  heading?: string;
+}
+
+const { items, heading = "On this page" } = Astro.props;
+
+if (items.length === 0) return;
+---
+
+<nav class="toc" aria-label="Table of contents">
+  <h4 class="toc-heading">{heading}</h4>
+  <ul class="toc-list">
+    {items.map((item) => (
+      <li class="toc-item" style={{ paddingLeft: `${(item.level - 2) * 1.25}rem` }}>
+        <a href={`#${item.id}`} class="toc-link">
+          {item.text}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .toc {
+    background: var(--color-bg-alt);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+    border: 1px solid var(--color-border);
+  }
+  .toc-heading {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+  }
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .toc-link {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+    display: block;
+    padding: var(--space-1) 0;
+  }
+  .toc-link:hover { color: var(--color-accent); }
+  .toc-link.active { color: var(--color-primary); font-weight: 600; }
+</style>
+
+<script>
+  // Highlight active heading on scroll
+  const links = document.querySelectorAll(".toc-link");
+  if (links.length > 0) {
+    const ids = Array.from(links).map((link) => link.getAttribute("href")?.slice(1));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            links.forEach((l) => l.classList.remove("active"));
+            const activeLink = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+            activeLink?.classList.add("active");
+          }
+        });
+      },
+      { rootMargin: "-80px 0px -70% 0px" }
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  }
+</script>

@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+// Clear the session cookie
+Astro.cookies.delete("admin_session", {
+  httpOnly: true,
+  sameSite: "strict",
+  path: "/",
+});
+
+// Redirect to login
+return Astro.redirect("/admin/login", 302);
+---

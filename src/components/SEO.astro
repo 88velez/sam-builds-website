@@ -1,0 +1,225 @@
+---
+/**
+ * SEO.astro — drop into any page's <head> via the BaseLayout.
+ * Generates: meta tags, Open Graph, Twitter Card, canonical, and JSON-LD schema.
+ */
+import { site } from "../data/site.config";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  article?: boolean;       // true on blog posts
+  publishedTime?: string;  // ISO date
+  modifiedTime?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = site.description,
+  image = site.ogImage,
+  article = false,
+  publishedTime,
+  modifiedTime,
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} — ${site.tagline}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? site.url).toString();
+const imageURL = new URL(image, Astro.site ?? site.url).toString();
+
+// ---- Schema.org / structured data ----
+// Build the schema base from site config, with type-specific refinements.
+const schemaBase = {
+  "@context": "https://schema.org",
+  name: site.name,
+  description: site.description,
+  url: site.url,
+  telephone: site.phone,
+  email: site.email,
+  priceRange: site.priceRange,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    addressRegion: site.address.state,
+    postalCode: site.address.zip,
+    addressCountry: site.address.country,
+  },
+  areaServed: site.serviceAreas.map((area) => ({ "@type": "City", name: area })),
+  sameAs: Object.values(site.social).filter(Boolean),
+};
+
+// Schema type presets — each maps to a different Schema.org @type
+// with appropriate property defaults for that business vertical.
+const schemaPresets: Record<string, object> = {
+  "LocalBusiness": {
+    "@type": "LocalBusiness",
+    ...schemaBase,
+  },
+  "ProfessionalService": {
+    "@type": "ProfessionalService",
+    ...schemaBase,
+  },
+  "HomeAndConstructionBusiness": {
+    "@type": "HomeAndConstructionBusiness",
+    ...schemaBase,
+  },
+  "Restaurant": {
+    "@type": "Restaurant",
+    ...schemaBase,
+    servesCuisine: "",
+  },
+  "MedicalBusiness": {
+    "@type": "MedicalBusiness",
+    ...schemaBase,
+    medicalSpecialty: "",
+  },
+  "Store": {
+    "@type": "Store",
+    ...schemaBase,
+  },
+  "RealEstateAgent": {
+    "@type": "RealEstateAgent",
+    ...schemaBase,
+  },
+  "HealthAndBeautyBusiness": {
+    "@type": "HealthAndBeautyBusiness",
+    ...schemaBase,
+  },
+  "AutomotiveBusiness": {
+    "@type": "AutomotiveBusiness",
+    ...schemaBase,
+  },
+  "Dentist": {
+    "@type": "Dentist",
+    ...schemaBase,
+  },
+  "Lawyer": {
+    "@type": "LegalService",
+    ...schemaBase,
+  },
+};
+
+// Use the configured schema type, fall back to LocalBusiness
+const businessSchema: any = schemaPresets[site.schemaType] || schemaPresets["LocalBusiness"];
+
+// ---- Analytics IDs (only loaded after consent — see the loader below) ----
+const gaId = site.analytics.googleAnalyticsId;
+const gtmId = site.analytics.googleTagManagerId;
+const fbPixelId = site.analytics.facebookPixelId;
+const plausibleDomain = site.analytics.plausibleDomain;
+const hasAnalytics = !!(gaId || gtmId || fbPixelId || plausibleDomain);
+---
+
+<!-- Charset & viewport -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!-- Primary meta -->
+<title>{fullTitle}</title>
+<meta name="title" content={fullTitle} />
+<meta name="description" content={description} />
+<meta name="generator" content={Astro.generator} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<!-- Canonical -->
+<link rel="canonical" href={canonicalURL} />
+
+<!-- Favicons (replace files in /public) -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+<!-- Open Graph -->
+<meta property="og:type" content={article ? "article" : "website"} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={imageURL} />
+<meta property="og:site_name" content={site.name} />
+{publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={fullTitle} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={imageURL} />
+
+<!-- JSON-LD: LocalBusiness -->
+<script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
+
+<!-- Sitemap & RSS hints -->
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="application/rss+xml" title={site.name} href="/rss.xml" />
+
+<!-- Analytics loader — runs only after cookie consent is granted (window.__consentGranted),
+     set by BaseLayout + CookieConsent. Loads whichever providers are configured. -->
+{hasAnalytics && (
+  <script is:inline define:vars={{ gaId, gtmId, fbPixelId, plausibleDomain }}>
+    (function () {
+      function load() {
+        if (window.__analyticsLoaded) return;
+        window.__analyticsLoaded = true;
+
+        // Google Analytics 4
+        if (gaId) {
+          var s = document.createElement("script");
+          s.async = true;
+          s.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
+          document.head.appendChild(s);
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () { window.dataLayer.push(arguments); };
+          window.gtag("js", new Date());
+          window.gtag("config", gaId);
+        }
+
+        // Google Tag Manager
+        if (gtmId) {
+          (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+            var f = d.getElementsByTagName(s)[0],
+              j = d.createElement(s);
+            j.async = true;
+            j.src = "https://www.googletagmanager.com/gtm.js?id=" + i;
+            f.parentNode.insertBefore(j, f);
+          })(window, document, "script", "dataLayer", gtmId);
+        }
+
+        // Facebook Pixel
+        if (fbPixelId) {
+          !(function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+              n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
+            t = b.createElement(e); t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s);
+          })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+          window.fbq("init", fbPixelId);
+          window.fbq("track", "PageView");
+        }
+
+        // Plausible (privacy-friendly alternative)
+        if (plausibleDomain) {
+          var p = document.createElement("script");
+          p.defer = true;
+          p.setAttribute("data-domain", plausibleDomain);
+          p.src = "https://plausible.io/js/script.js";
+          document.head.appendChild(p);
+        }
+      }
+
+      if (window.__consentGranted) load();
+      else document.addEventListener("cookieconsent:accepted", load, { once: true });
+    })();
+  </script>
+)}
